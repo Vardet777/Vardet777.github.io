@@ -38,19 +38,72 @@ function add(role, text, meta) {
   d.scrollIntoView({ behavior: "smooth", block: "end" });
 }
 function setStatus(text) { statusEl.textContent = text; }
+
+const MALE_VOICE = /oskar|ingmar|erik|magnus|male|manlig|daniel|samantha|siri male|maged|rishi|xander/i;
+const SV_PREFERRED = ["elin", "klara", "alva", "ebba", "sofie"];
+function voiceList() { return window.speechSynthesis?.getVoices?.() || []; }
+function scoreVoice(v) {
+  const name = String(v.name || "");
+  const lang = String(v.lang || "").toLowerCase();
+  if (!/^sv/.test(lang)) return -100;
+  if (MALE_VOICE.test(name)) return -50;
+  let score = 20;
+  const lower = name.toLowerCase();
+  SV_PREFERRED.forEach((p, i) => { if (lower.includes(p)) score += 40 - i * 4; });
+  return score;
+}
 function pickVoice() {
-  const list = window.speechSynthesis?.getVoices?.() || [];
-  return list.find((v) => /sv/i.test(v.lang)) || null;
+  const list = voiceList();
+  if (settings.voiceURI) {
+    const locked = list.find((v) => v.voiceURI === settings.voiceURI);
+    if (locked) return locked;
+  }
+  const ranked = list.map((v) => ({ v, s: scoreVoice(v) })).filter((x) => x.s > 0).sort((a, b) => b.s - a.s);
+  return ranked[0]?.v || list.find((v) => /^sv/i.test(v.lang)) || null;
+}
+function whenVoicesReady() {
+  return new Promise((resolve) => {
+    if (!window.speechSynthesis) return resolve([]);
+    const now = voiceList();
+    if (now.length) return resolve(now);
+    const done = () => resolve(voiceList());
+    window.speechSynthesis.addEventListener("voiceschanged", done, { once: true });
+    setTimeout(done, 900);
+  });
+}
+function fillVoiceSelect() {
+  const sel = document.getElementById("voice-pick");
+  if (!sel) return;
+  const list = voiceList().filter((v) => /^sv/i.test(v.lang) && !MALE_VOICE.test(v.name || ""));
+  const chosen = pickVoice();
+  sel.innerHTML = "";
+  const auto = document.createElement("option");
+  auto.value = "";
+  auto.textContent = chosen ? `Automatisk (${chosen.name})` : "Automatisk svensk";
+  sel.appendChild(auto);
+  for (const v of list) {
+    const o = document.createElement("option");
+    o.value = v.voiceURI;
+    o.textContent = `${v.name} · ${v.lang}`;
+    if (settings.voiceURI && settings.voiceURI === v.voiceURI) o.selected = true;
+    sel.appendChild(o);
+  }
 }
 function speak(text) {
   if (!settings.voiceOn || !window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = "sv-SE";
+  u.rate = 0.96;
+  u.pitch = 1.04;
   const v = pickVoice();
-  if (v) u.voice = v;
+  if (v) {
+    u.voice = v;
+    u.lang = v.lang || "sv-SE";
+  }
   window.speechSynthesis.speak(u);
 }
+
 function isStandalone() {
   return window.navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches;
 }
@@ -60,11 +113,14 @@ function showInstallHint() {
   installEl.textContent = "Dela → Lägg till på hemskärmen.";
 }
 async function boot() {
-  setStatus("lokal · " + linnea.name);
+  await whenVoicesReady();
+  fillVoiceSelect();
+  const v = pickVoice();
+  setStatus(v ? `lokal · ${linnea.name} · ${v.name}` : "lokal · " + linnea.name);
   showInstallHint();
   if (!session.greetingSent) {
     const r = await handleTurn({ text: "", memory, session, settings, wantGreeting: true });
-    add("linnea", r.reply, "hälsning");
+    add("linnea", r.reply, v ? "hälsning · " + v.name : "hälsning");
     speak("Hej. Jag är Linnea.");
   } else if (session.turns.length) {
     for (const t of session.turns.slice(-16)) add(t.role === "user" ? "user" : "linnea", t.content, t.provider || "");
@@ -122,6 +178,7 @@ function renderSheet() {
   document.getElementById("llm-key").value = settings.llmKey || "";
   document.getElementById("use-xai").checked = settings.useXai === true;
   document.getElementById("voice-on").checked = settings.voiceOn !== false;
+  fillVoiceSelect();
   document.getElementById("pair-url").value = settings.pairUrl || "";
   document.getElementById("pair-token").value = settings.pairToken || "";
 }
@@ -150,10 +207,12 @@ document.getElementById("save-settings").addEventListener("click", () => {
     llmKey: document.getElementById("llm-key").value.trim(),
     useXai: document.getElementById("use-xai").checked,
     voiceOn: document.getElementById("voice-on").checked,
+    voiceURI: document.getElementById("voice-pick")?.value || "",
     pairUrl: document.getElementById("pair-url").value.trim().replace(/\/$/, ""),
     pairToken: document.getElementById("pair-token").value.trim()
   });
-  setStatus("lokal");
+  const v = pickVoice();
+  setStatus(v ? "lokal · " + v.name : "lokal");
   sheet.hidden = true;
 });
 document.getElementById("sync-pull").addEventListener("click", () => setStatus("sync kräver dator — skippas här"));
@@ -170,4 +229,5 @@ document.getElementById("import-file").addEventListener("change", async (e) => {
   if (!file) return;
   try { importArchive(JSON.parse(await file.text())); renderSheet(); } catch { setStatus("kunde inte läsa arkivet"); }
 });
+if (window.speechSynthesis) window.speechSynthesis.onvoiceschanged = fillVoiceSelect;
 boot();
