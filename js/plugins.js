@@ -1,4 +1,5 @@
-import { legalDisclaimer, projectLegal, standingRules } from "./legal.js";
+import { legalDisclaimer, projectLegal, standingRules, legalBrief, legalRevisionSummary } from "./legal.js";
+import { projects, characters } from "./atlas.js";
 
 export const PLUGIN_VERSION = "1.0.0";
 
@@ -33,8 +34,8 @@ export const plugins = [
         ok: true,
         pluginText: [
           "Klarhet:",
-          ...parts.slice(0, 3).map((p, i) => `${i + 1}. ${p}`),
-          `Nästa handling: ${nextAction(raw)}`,
+          ...parts.slice(0, 3).map((p, i) => (i + 1) + ". " + p),
+          "Nästa handling: " + nextAction(raw),
           "Jag har inte lagt till fakta du inte skrev."
         ].join("\n")
       };
@@ -49,7 +50,7 @@ export const plugins = [
         ok: true,
         pluginText: [
           "Beslut (ägare först, inte advokat):",
-          `Läget: ${raw}`,
+          "Läget: " + raw,
           "A — gör det nu om kostnaden är låg och det går att ångra.",
           "B — vänta om det kräver Outlook, pengar, OSS-licens, varumärke eller andras kod.",
           "C — skriv avtal först om en utomstående ska in.",
@@ -68,7 +69,7 @@ export const plugins = [
         ok: true,
         pluginText: [
           "Plan:",
-          `Idag: ${clip(raw, 80)} — ett synligt steg.`,
+          "Idag: " + clip(raw, 80) + " — ett synligt steg.",
           "Veckan: samma sak färdig nog att testa.",
           "Inte nu: App Store, lur, dold mic, OSS-släpp, patentansökan utan underlag."
         ].join("\n")
@@ -80,10 +81,7 @@ export const plugins = [
     re: /^(fokus|en sak)\s*[:\-]?\s*(.+)$/i,
     run(_ctx, args) {
       const raw = String(args[1] || args[0] || "").trim();
-      return {
-        ok: true,
-        pluginText: `Fokus: ${clip(raw, 140)}\nResten väntar. Ingen andra grej förrän den här är antingen klar eller medvetet parkerad.`
-      };
+      return { ok: true, pluginText: "Fokus: " + clip(raw, 140) + "\nResten väntar. Ingen andra grej förrän den här är antingen klar eller medvetet parkerad." };
     }
   },
   {
@@ -96,7 +94,7 @@ export const plugins = [
         ok: true,
         pluginText: [
           "Granskning:",
-          `Påstått: ${raw}`,
+          "Påstått: " + raw,
           invented
             ? "Påhitt-risk: meningen låter som ett avslutat faktum. I den här runtime:n är mejl utkast, telefon simulator och App Store inte påbörjad."
             : "Jag ser inget uppenbart påhitt i orden. Det betyder inte att det är sant utanför det du just skrev.",
@@ -110,15 +108,13 @@ export const plugins = [
     re: /^(risk|flagga risk|vad är risken)\s*[:\-]?\s*(.+)$/i,
     run(_ctx, args) {
       const raw = String(args[1] || args[0] || "").trim();
-      const hits = projectLegal.filter((p) =>
-        raw.toLowerCase().includes(p.name.toLowerCase().split(" ")[0])
-      );
+      const hits = projectLegal.filter((p) => raw.toLowerCase().includes(p.name.toLowerCase().split(" ")[0]));
       const highs = (hits[0]?.highs || standingRules.slice(0, 3)).slice(0, 3);
       return {
         ok: true,
         pluginText: [
-          hits[0] ? `Risk mot ${hits[0].name} (${hits[0].headline})` : "Risk (generell bevakning):",
-          ...highs.map((h) => `- Hög/Bevaka: ${h}`),
+          hits[0] ? "Risk mot " + hits[0].name + " (" + hits[0].headline + ")" : "Risk (generell bevakning):",
+          ...highs.map((h) => "- Hög/Bevaka: " + h),
           legalDisclaimer
         ].join("\n")
       };
@@ -147,14 +143,47 @@ export const plugins = [
     }
   },
   {
+    id: "plugins.juridiken",
+    re: /^(juridiken|juridisk bevakning|vilka juridiska (regler|risker)|lär juridik)\s*\??$/i,
+    run() {
+      return { ok: true, pluginText: legalBrief() };
+    }
+  },
+  {
+    id: "plugins.revidera",
+    re: /^(revidera|gör en revidering|juridisk revidering|analysera projekten)\s*\??$/i,
+    run() {
+      return { ok: true, pluginText: legalRevisionSummary() };
+    }
+  },
+  {
+    id: "plugins.projekt",
+    re: /^(vilka projekt|vilka projekt har vi|lista projekt)\s*\??$/i,
+    run() {
+      const lines = (projects || []).map((p) => "- " + p.name + ": " + p.fact);
+      return {
+        ok: true,
+        pluginText: lines.length
+          ? "Projekt jag har i atlas, på översiktsnivå:\n" + lines.join("\n") + "\nViccy är en annan följeslagare. Jag är inte hon."
+          : "Atlas är tom i den här skalet."
+      };
+    }
+  },
+  {
+    id: "plugins.viccy",
+    re: /^(vem är viccy|vad är viccy)\s*\??$/i,
+    run() {
+      const v = characters?.viccy;
+      return { ok: true, pluginText: v ? ("Viccy är inte jag. " + v.role + " " + (v.accessRule || "")).trim() : "Viccy är en separat följeslagare. Inte Linnea." };
+    }
+  },
+  {
     id: "plugins.sammanfatta",
     re: /^(sammanfatta|recap|vad sa vi)\s*\??$/i,
     run(ctx) {
       const turns = ctx.session?.turns || [];
-      if (!turns.length) {
-        return { ok: true, pluginText: "Ingen tråd att sammanfatta än." };
-      }
-      const last = turns.slice(-6).map((t) => `${t.role === "user" ? "Du" : "Linnea"}: ${clip(t.content, 90)}`);
+      if (!turns.length) return { ok: true, pluginText: "Ingen tråd att sammanfatta än." };
+      const last = turns.slice(-6).map((t) => (t.role === "user" ? "Du" : "Linnea") + ": " + clip(t.content, 90));
       return { ok: true, pluginText: "Senaste tråden:\n" + last.join("\n") };
     }
   }
@@ -174,7 +203,7 @@ export function runPlugin(parsed, ctx) {
 }
 
 function splitBits(raw) {
-  const bySep = raw.split(/\s*(?:\.|;| och | plus )\s*/i).map((s) => s.trim()).filter(Boolean);
+  const bySep = raw.split(/\s*(?:\.|\;| och | plus )\s*/i).map((s) => s.trim()).filter(Boolean);
   if (bySep.length >= 2) return bySep;
   return [raw, "Vad som saknas är fortfarande osagt.", "Nästa mening ska vara ett verb."];
 }
