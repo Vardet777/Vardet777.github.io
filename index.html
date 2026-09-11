@@ -40,7 +40,7 @@ button.hot{background:#7a1a08;color:var(--ink)}
 .panel h2{color:var(--ember);font-family:Georgia,serif;margin:0 0 8px}
 .panel p,.hint{color:var(--muted);font-size:12px}
 .panel label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
-.panel input[type=text],.panel input[type=password],.panel input[type=url],.panel input[type=file]{width:100%;padding:10px 12px;border-radius:12px;border:1px solid #4a2a24;background:#0c0808ee;color:var(--ink);font-size:16px}
+.panel input[type=text],.panel input[type=password],.panel input[type=url],.panel input[type=file],.panel select{width:100%;padding:10px 12px;border-radius:12px;border:1px solid #4a2a24;background:#0c0808ee;color:var(--ink);font-size:16px}
 .row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
 .panel ul{margin:6px 0 10px;padding-left:18px}
 .panel li{margin:4px 0}
@@ -96,6 +96,9 @@ button.hot{background:#7a1a08;color:var(--ink)}
     <input id="llm-key" type="password" autocomplete="off"/>
     <label><input id="use-xai" type="checkbox"/> Använd xAI sist</label>
     <label><input id="voice-on" type="checkbox" checked/> Läs upp svar</label>
+    <label>Röst på telefonen</label>
+    <select id="voice-pick"></select>
+    <p class="hint">Liora är Grok-rösten och finns inte i Safari. Välj svensk kvinnlig systemröst (Elin / Klara / Alva).</p>
     <label>Datorns adress för sync</label>
     <input id="pair-url" type="url" placeholder="http://192.168.x.x:8787"/>
     <label>Parningskod</label>
