@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="Linnea">
+  <rect width="180" height="180" rx="36" fill="#120805"/>
+  <circle cx="90" cy="78" r="28" fill="#3a1616" stroke="#e07a4a" stroke-width="2"/>
+  <path d="M42 158c8-32 28-48 48-48s40 16 48 48" fill="#3a1616"/>
+  <text x="90" y="88" text-anchor="middle" fill="#f3e6dc" font-family="Georgia,serif" font-size="22">L</text>
+</svg>
