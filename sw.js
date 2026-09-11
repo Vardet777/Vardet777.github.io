@@ -1,4 +1,4 @@
-const CACHE = "linnea-shell-v12";
+const CACHE = "linnea-shell-v13";
 const SHELL = ["./","./index.html","./manifest.webmanifest","./js/app.js","./js/linnea-runtime.js","./js/atlas.js","./js/legal.js","./js/sync-merge.js","./js/plugins.js","./js/providers.js","./js/composer.js"];
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
