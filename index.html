@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Linnea"/>
+<meta name="theme-color" content="#050506"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<link rel="manifest" href="manifest.webmanifest"/>
+<title>Linnea</title>
+<style>
+:root{--ember:#e07a4a;--ink:#f3e6dc;--muted:#9a8078}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{font-family:Georgia,serif;color:var(--ink);display:flex;flex-direction:column;background:#050506;overflow:hidden}
+.stage{position:fixed;inset:-16%;background:#120805;z-index:0}
+.embers{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 30% 110%,#e07a4a44 0 12%,transparent 36%)}
+.veil{position:fixed;inset:0;background:linear-gradient(180deg,#000000c0 0%,#00000040 36%,#14080599 100%);z-index:0}
+header,main,#sheet,#install{position:relative;z-index:1}
+header{padding:max(16px,env(safe-area-inset-top)) 14px 10px;display:flex;gap:12px;align-items:center}
+header strong{color:var(--ember);font-size:20px}
+#status{font:11px ui-sans-serif,system-ui;color:var(--muted)}
+#install{margin:0 14px;padding:8px 10px;border-radius:12px;background:#120c0caa;border:1px solid #3a2220;font:12px ui-sans-serif,system-ui;color:var(--ink)}
+main{flex:1;min-height:0;display:flex;flex-direction:column;padding:8px 14px 0}
+#log{flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:88%;padding:11px 14px;border-radius:18px;white-space:pre-wrap;line-height:1.45}
+.linnea{align-self:flex-start;background:#1c0f0eee}
+.user{align-self:flex-end;background:#3a1616ee}
+.meta{font:10px ui-sans-serif,system-ui;color:var(--muted);margin-top:6px}
+form{display:flex;flex-direction:column;gap:8px;padding:10px 0 calc(22px + env(safe-area-inset-bottom))}
+#t{width:100%;padding:13px 14px;border-radius:16px;border:1px solid #4a2a24;background:#0c0808ee;color:var(--ink);font-size:16px}
+.actions{display:grid;grid-template-columns:1fr 1fr auto;gap:8px}
+button{background:var(--ember);color:#1a0c08;border:0;border-radius:16px;padding:13px 14px;font:600 15px ui-sans-serif,system-ui}
+button.ghost{background:#120c0caa;color:var(--ink);border:1px solid #3a2220}
+button.hot{background:#7a1a08;color:var(--ink)}
+#sheet{position:fixed;inset:0;background:#0008;display:flex;align-items:flex-end;z-index:30}
+#sheet[hidden]{display:none}
+.panel{background:#120c0cf2;width:100%;border-radius:22px 22px 0 0;padding:18px 16px calc(28px + env(safe-area-inset-bottom));font-family:ui-sans-serif,system-ui;max-height:86%;overflow:auto}
+.panel h2{color:var(--ember);font-family:Georgia,serif;margin:0 0 8px}
+.panel p,.hint{color:var(--muted);font-size:12px}
+.panel label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
+.panel input[type=text],.panel input[type=password],.panel input[type=url],.panel input[type=file]{width:100%;padding:10px 12px;border-radius:12px;border:1px solid #4a2a24;background:#0c0808ee;color:var(--ink);font-size:16px}
+.row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.panel ul{margin:6px 0 10px;padding-left:18px}
+.panel li{margin:4px 0}
+.panel li.empty{color:var(--muted);list-style:none;margin-left:-18px}
+</style>
+</head>
+<body>
+<div class="stage" aria-hidden="true"></div>
+<div class="embers" aria-hidden="true"></div>
+<div class="veil" aria-hidden="true"></div>
+<header>
+  <div style="flex:1"><strong>Linnea</strong><div id="status">på enheten</div></div>
+  <button type="button" class="ghost" id="open-sheet">Inställningar</button>
+</header>
+<div id="install" hidden></div>
+<main>
+  <div id="log"></div>
+  <form id="f">
+    <input id="t" placeholder="Skriv till Linnea…" enterkeyhint="send" autocomplete="off"/>
+    <div class="actions">
+      <button type="button" class="ghost" id="mic">Prata</button>
+      <button type="submit">Skicka</button>
+      <button type="button" class="ghost" id="open-sheet-2">•••</button>
+    </div>
+  </form>
+</main>
+<div id="sheet" hidden>
+  <div class="panel">
+    <h2>Linnea</h2>
+    <p>Nyckeln stannar på telefonen. Inte Viccy. Inte Queen.</p>
+    <label>Minnen</label>
+    <ul id="mem-list"></ul>
+    <div class="row">
+      <input id="mem-new" type="text" placeholder="kom ihåg …"/>
+      <button type="button" id="mem-add">Spara</button>
+    </div>
+    <label>Dagbok (lokal, inte mejlad)</label>
+    <ul id="diary-list"></ul>
+    <div class="row">
+      <input id="diary-new" type="text" placeholder="dagens rad"/>
+      <button type="button" id="diary-add">Anteckna</button>
+    </div>
+    <p class="hint">Kö: kommando → Groq → OpenRouter free → lokal. xAI bara om rutan är ikryssad.</p>
+    <label>Groq-nyckel</label>
+    <input id="groq-key" type="password" autocomplete="off"/>
+    <label>OpenRouter-nyckel</label>
+    <input id="or-key" type="password" autocomplete="off"/>
+    <label>xAI-bas</label>
+    <input id="llm-base" type="url" placeholder="https://api.x.ai/v1"/>
+    <label>xAI-modell</label>
+    <input id="llm-model" type="text" placeholder="grok-4.6"/>
+    <label>xAI-nyckel</label>
+    <input id="llm-key" type="password" autocomplete="off"/>
+    <label><input id="use-xai" type="checkbox"/> Använd xAI sist</label>
+    <label><input id="voice-on" type="checkbox" checked/> Läs upp svar</label>
+    <label>Datorns adress för sync</label>
+    <input id="pair-url" type="url" placeholder="http://192.168.x.x:8787"/>
+    <label>Parningskod</label>
+    <input id="pair-token" type="password" autocomplete="off"/>
+    <div class="row">
+      <button type="button" class="ghost" id="sync-pull">Hämta</button>
+      <button type="button" class="ghost" id="sync-push">Skicka</button>
+    </div>
+    <div class="row">
+      <button type="button" class="ghost" id="export-btn">Exportera</button>
+      <input id="import-file" type="file" accept="application/json"/>
+    </div>
+    <div class="row">
+      <button type="button" id="save-settings">Spara</button>
+      <button type="button" class="ghost" id="close-sheet">Stäng</button>
+    </div>
+  </div>
+</div>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
