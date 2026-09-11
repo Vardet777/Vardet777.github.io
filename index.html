@@ -9,16 +9,21 @@
 <meta name="theme-color" content="#050506"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <link rel="manifest" href="manifest.webmanifest"/>
+<link rel="apple-touch-icon" href="icons/linnea.svg"/>
+<link rel="icon" href="icons/linnea.svg" type="image/svg+xml"/>
 <title>Linnea</title>
 <style>
 :root{--ember:#e07a4a;--ink:#f3e6dc;--muted:#9a8078}
 *{box-sizing:border-box}html,body{height:100%;margin:0}
 body{font-family:Georgia,serif;color:var(--ink);display:flex;flex-direction:column;background:#050506;overflow:hidden}
-.stage{position:fixed;inset:-16%;background:#120805;z-index:0}
-.embers{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 30% 110%,#e07a4a44 0 12%,transparent 36%)}
+.stage{position:fixed;inset:-16%;background:#120805;animation:drift 16s ease-in-out infinite alternate;z-index:0}
+.embers{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 30% 110%,#e07a4a44 0 12%,transparent 36%);animation:flicker 2.2s ease-in-out infinite alternate}
 .veil{position:fixed;inset:0;background:linear-gradient(180deg,#000000c0 0%,#00000040 36%,#14080599 100%);z-index:0}
+@keyframes drift{from{transform:scale(1.05)}to{transform:scale(1.18) translate3d(-2%,-3%,0)}}
+@keyframes flicker{from{opacity:.65}to{opacity:1}}
 header,main,#sheet,#install{position:relative;z-index:1}
 header{padding:max(16px,env(safe-area-inset-top)) 14px 10px;display:flex;gap:12px;align-items:center}
+.avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;object-position:center 18%;border:1px solid var(--ember)}
 header strong{color:var(--ember);font-size:20px}
 #status{font:11px ui-sans-serif,system-ui;color:var(--muted)}
 #install{margin:0 14px;padding:8px 10px;border-radius:12px;background:#120c0caa;border:1px solid #3a2220;font:12px ui-sans-serif,system-ui;color:var(--ink)}
@@ -52,6 +57,7 @@ button.hot{background:#7a1a08;color:var(--ink)}
 <div class="embers" aria-hidden="true"></div>
 <div class="veil" aria-hidden="true"></div>
 <header>
+  <img class="avatar" alt="Linnea" src="icons/linnea.svg"/>
   <div style="flex:1"><strong>Linnea</strong><div id="status">på enheten</div></div>
   <button type="button" class="ghost" id="open-sheet">Inställningar</button>
 </header>
@@ -70,35 +76,39 @@ button.hot{background:#7a1a08;color:var(--ink)}
 <div id="sheet" hidden>
   <div class="panel">
     <h2>Linnea</h2>
-    <p>Nyckeln stannar på telefonen. Inte Viccy. Inte Queen.</p>
+    <p>En källa: den här skalet kör <code>js/app.js</code> + <code>js/linnea-runtime.js</code>. Nyckeln stannar på telefonen. Inte Viccy. Inte Queen.</p>
+
     <label>Minnen</label>
     <ul id="mem-list"></ul>
     <div class="row">
       <input id="mem-new" type="text" placeholder="kom ihåg …"/>
       <button type="button" id="mem-add">Spara</button>
     </div>
+
     <label>Dagbok (lokal, inte mejlad)</label>
     <ul id="diary-list"></ul>
     <div class="row">
       <input id="diary-new" type="text" placeholder="dagens rad"/>
       <button type="button" id="diary-add">Anteckna</button>
     </div>
-    <p class="hint">Kö: kommando → Groq → OpenRouter free → lokal. xAI bara om rutan är ikryssad.</p>
-    <label>Groq-nyckel</label>
+
+    <p class="hint">Kö: kommando → Groq → OpenRouter free → lokal. xAI bara om rutan nedan är ikryssad och det finns kredit. Copilot, Gemini, Claude och deep search: saknar väg.</p>
+    <label>Groq-nyckel (gratis-tier, valfri)</label>
     <input id="groq-key" type="password" autocomplete="off"/>
-    <label>OpenRouter-nyckel</label>
+    <label>OpenRouter-nyckel (free-modell, valfri)</label>
     <input id="or-key" type="password" autocomplete="off"/>
-    <label>xAI-bas</label>
+    <label>xAI-bas (används inte som default)</label>
     <input id="llm-base" type="url" placeholder="https://api.x.ai/v1"/>
     <label>xAI-modell</label>
     <input id="llm-model" type="text" placeholder="grok-4.6"/>
     <label>xAI-nyckel</label>
     <input id="llm-key" type="password" autocomplete="off"/>
-    <label><input id="use-xai" type="checkbox"/> Använd xAI sist</label>
-    <label><input id="voice-on" type="checkbox" checked/> Läs upp svar</label>
+    <label><input id="use-xai" type="checkbox"/> Använd xAI sist (kräver kredit)</label>
+    <label><input id="voice-on" type="checkbox" checked/> Läs upp svar (webbläsaren, inte lur)</label>
     <label>Röst på telefonen</label>
     <select id="voice-pick"></select>
-    <p class="hint">Liora är Grok-rösten och finns inte i Safari. Välj svensk kvinnlig systemröst (Elin / Klara / Alva).</p>
+    <p class="hint">Liora är Grok-rösten och finns inte i Safari. Välj svensk kvinnlig systemröst (Elin / Klara / Alva). Inte Viccy EVIE. Inte Queen ZELDA.</p>
+
     <label>Datorns adress för sync</label>
     <input id="pair-url" type="url" placeholder="http://192.168.x.x:8787"/>
     <label>Parningskod</label>
@@ -107,10 +117,12 @@ button.hot{background:#7a1a08;color:var(--ink)}
       <button type="button" class="ghost" id="sync-pull">Hämta</button>
       <button type="button" class="ghost" id="sync-push">Skicka</button>
     </div>
+
     <div class="row">
       <button type="button" class="ghost" id="export-btn">Exportera</button>
       <input id="import-file" type="file" accept="application/json"/>
     </div>
+    <p class="hint">Sync slår ihop. Skriver inte över. Utan kod är /api/sync 401. Mejl skickas inte härifrån.</p>
     <div class="row">
       <button type="button" id="save-settings">Spara</button>
       <button type="button" class="ghost" id="close-sheet">Stäng</button>
