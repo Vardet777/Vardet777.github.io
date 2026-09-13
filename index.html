@@ -50,6 +50,11 @@ button.hot{background:#7a1a08;color:var(--ink)}
 .panel ul{margin:6px 0 10px;padding-left:18px}
 .panel li{margin:4px 0}
 .panel li.empty{color:var(--muted);list-style:none;margin-left:-18px}
+.site-nav{display:flex;gap:8px;padding:0 14px 8px;position:relative;z-index:1;font:12px ui-sans-serif,system-ui}
+.site-nav button{background:#120c0caa;color:var(--ink);border:1px solid #3a2220;border-radius:999px;padding:6px 10px;font:12px ui-sans-serif,system-ui}
+.site-nav .later{opacity:.45}
+.plugins{display:flex;gap:6px;overflow-x:auto;padding:0 14px 8px;position:relative;z-index:1;-webkit-overflow-scrolling:touch}
+.plugins button{flex:0 0 auto;background:#1c0f0eee;color:var(--ink);border:1px solid #3a2220;border-radius:999px;padding:8px 12px;font:600 12px ui-sans-serif,system-ui}
 </style>
 </head>
 <body>
@@ -61,6 +66,24 @@ button.hot{background:#7a1a08;color:var(--ink)}
   <div style="flex:1"><strong>Linnea</strong><div id="status">på enheten</div></div>
   <button type="button" class="ghost" id="open-sheet">Inställningar</button>
 </header>
+<nav class="site-nav" aria-label="Linnea-sajt">
+  <button type="button" data-go="chat">Prata</button>
+  <button type="button" data-go="plugins">Plugins</button>
+  <button type="button" class="later" id="login-later">Inloggning sist</button>
+</nav>
+<div class="plugins" id="plugin-dock" hidden>
+  <button type="button" data-cmd="plugins">vad kan du</button>
+  <button type="button" data-cmd="klarhet: ">klarhet</button>
+  <button type="button" data-cmd="beslut: ">beslut</button>
+  <button type="button" data-cmd="plan: ">plan</button>
+  <button type="button" data-cmd="fokus: ">fokus</button>
+  <button type="button" data-cmd="granska: ">granska</button>
+  <button type="button" data-cmd="risk: ">risk</button>
+  <button type="button" data-cmd="juridiken">juridiken</button>
+  <button type="button" data-cmd="revidera">revidera</button>
+  <button type="button" data-cmd="vilka projekt har vi">projekt</button>
+  <button type="button" data-cmd="läge">läge</button>
+</div>
 <div id="install" hidden></div>
 <main>
   <div id="log"></div>
@@ -77,7 +100,7 @@ button.hot{background:#7a1a08;color:var(--ink)}
 <div id="sheet" hidden>
   <div class="panel">
     <h2>Linnea</h2>
-    <p>En källa: den här skalet kör <code>js/app.js</code> + <code>js/linnea-runtime.js</code>. Nyckeln stannar på telefonen. Inte Viccy. Inte Queen.</p>
+    <p>En källa. Nyckeln stannar på telefonen. Inte Viccy. Inte Queen.</p>
     <label>Minnen</label>
     <ul id="mem-list"></ul>
     <div class="row">
@@ -90,22 +113,21 @@ button.hot{background:#7a1a08;color:var(--ink)}
       <input id="diary-new" type="text" placeholder="dagens rad"/>
       <button type="button" id="diary-add">Anteckna</button>
     </div>
-    <p class="hint">Kö: kommando → Groq → OpenRouter free → lokal. xAI bara om rutan nedan är ikryssad och det finns kredit. Copilot, Gemini, Claude och deep search: saknar väg.</p>
-    <label>Groq-nyckel (gratis-tier, valfri)</label>
+    <p class="hint">Kö: kommando → Groq → OpenRouter free → lokal. xAI bara om rutan är ikryssad. Copilot, Gemini, Claude, deep search: saknar väg. Inloggning är sist och inte byggd.</p>
+    <label>Groq-nyckel (valfri)</label>
     <input id="groq-key" type="password" autocomplete="off"/>
-    <label>OpenRouter-nyckel (free-modell, valfri)</label>
+    <label>OpenRouter-nyckel (valfri)</label>
     <input id="or-key" type="password" autocomplete="off"/>
-    <label>xAI-bas (används inte som default)</label>
+    <label>xAI-bas</label>
     <input id="llm-base" type="url" placeholder="https://api.x.ai/v1"/>
     <label>xAI-modell</label>
     <input id="llm-model" type="text" placeholder="grok-4.6"/>
     <label>xAI-nyckel</label>
     <input id="llm-key" type="password" autocomplete="off"/>
-    <label><input id="use-xai" type="checkbox"/> Använd xAI sist (kräver kredit)</label>
-    <label><input id="voice-on" type="checkbox" checked/> Läs upp svar (webbläsaren, inte lur)</label>
+    <label><input id="use-xai" type="checkbox"/> Använd xAI sist</label>
+    <label><input id="voice-on" type="checkbox" checked/> Läs upp svar</label>
     <label>Röst på telefonen</label>
     <select id="voice-pick"></select>
-    <p class="hint">Liora är Grok-rösten och finns inte i Safari. Välj svensk kvinnlig systemröst (Elin / Klara / Alva). Inte Viccy EVIE. Inte Queen ZELDA.</p>
     <label>Datorns adress för sync</label>
     <input id="pair-url" type="url" placeholder="http://192.168.x.x:8787"/>
     <label>Parningskod</label>
@@ -118,7 +140,6 @@ button.hot{background:#7a1a08;color:var(--ink)}
       <button type="button" class="ghost" id="export-btn">Exportera</button>
       <input id="import-file" type="file" accept="application/json"/>
     </div>
-    <p class="hint">Sync slår ihop. Skriver inte över. Utan kod är /api/sync 401. Mejl skickas inte härifrån.</p>
     <div class="row">
       <button type="button" id="save-settings">Spara</button>
       <button type="button" class="ghost" id="close-sheet">Stäng</button>
