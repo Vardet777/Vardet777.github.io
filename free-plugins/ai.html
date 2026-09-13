@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Free-Plugins — AI-kopplingar</title>
+<link rel="stylesheet" href="./css/site.css?v=21"/>
+<link rel="stylesheet" href="./css/photos-a.css?v=21"/>
+<link rel="stylesheet" href="./css/photos.css?v=21"/>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top" id="site-header"></header>
+    <p class="kicker">Gratis AI</p>
+    <h1>Koppla AI:erna till Linnea</h1>
+    <p class="lead">Nycklar stannar i den här webbläsaren. Inga butiker skrapas. Install-AI får pack som text.</p>
+    <p class="status" id="stat"></p>
+    <div id="keys" class="grid"></div>
+    <h2>Ytor per AI</h2>
+    <div id="ais"></div>
+    <p class="hint">Live-chatt: Groq → OpenRouter → Gemini → Mistral → Cerebras → xAI. ChatGPT/Claude/Cursor via Pack-export.</p>
+    <footer id="site-footer"></footer>
+  </div>
+  <script type="module">
+    import "./js/shell.js";
+    import { loadConnectors, pluginCount, wiredCount } from "./js/connectors.js";
+    import { PROVIDERS, getKey, setKey, getModel, setModel, liveQueue } from "./js/providers.js";
+    const data = await loadConnectors();
+    document.getElementById("stat").innerHTML =
+      `<span><i class="dot on"></i> ${data.ais.length} AI</span>` +
+      `<span>${pluginCount(data)} plugin-ytor</span>` +
+      `<span>${wiredCount(data)} med API-kö</span>` +
+      `<span>${liveQueue().length} nycklar i den här enheten</span>`;
+    const keys = document.getElementById("keys");
+    for (const p of PROVIDERS) {
+      const card = document.createElement("article");
+      card.className = "card";
+      card.innerHTML = `<h3>${p.label} ${p.gratis ? '<span class="badge gratis">Gratis</span>' : '<span class="badge betal">Nyckel</span>'}</h3><p><a href="${p.keyUrl}" target="_blank" rel="noopener">Hämta nyckel</a></p><form class="stack"><label>Nyckel<input type="password" data-key="${p.id}" value="${getKey(p.id)}" autocomplete="off"/></label><label>Modell<input data-model="${p.id}" value="${getModel(p.id)}" autocomplete="off"/></label><button type="submit">Spara</button></form>`;
+      card.querySelector("form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        setKey(p.id, card.querySelector("[data-key]").value);
+        setModel(p.id, card.querySelector("[data-model]").value);
+        location.reload();
+      });
+      keys.appendChild(card);
+    }
+    const box = document.getElementById("ais");
+    for (const ai of data.ais) {
+      const art = document.createElement("article");
+      art.className = "card";
+      const plugs = (ai.plugins || []).map((pl) => `<li><strong>${pl.name}</strong> — ${pl.how}</li>`).join("");
+      art.innerHTML = `<h3>${ai.name} ${ai.wired ? '<span class="badge gratis">API</span>' : '<span class="badge">export</span>'}</h3><p><a href="${ai.keyUrl}" target="_blank" rel="noopener">Officiell yta</a> · <a href="${ai.docs}" target="_blank" rel="noopener">Dokumentation</a></p><ul class="facts">${plugs}</ul>`;
+      box.appendChild(art);
+    }
+  </script>
+</body>
+</html>
