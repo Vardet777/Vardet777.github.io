@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Free-Plugins — Azure-plugin</title>
+<link rel="stylesheet" href="./css/site.css?v=20"/>
+<link rel="stylesheet" href="./css/photos-a.css?v=20"/>
+<link rel="stylesheet" href="./css/photos.css?v=20"/>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top" id="site-header"></header>
+    <p class="kicker">Plugin</p>
+    <h1>Koppla Azure-appen</h1>
+    <p class="lead">Det här är pluginet. Microsoft äger portalen. Du registrerar appen där. Client-id klistras in här. Ingen client secret. Inte publicerad som produkt.</p>
+    <article class="card">
+      <h3>1. Öppna Azure och skapa appen</h3>
+      <p>Plattform: Single-page application. Stöd för personliga Microsoft-konton + jobb.</p>
+      <p class="hint">Redirect URI att klistra in i Azure:</p>
+      <p><code id="redir"></code></p>
+      <p style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        <a href="https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/CreateApplicationBlade"><button type="button">Skapa app i Azure</button></a>
+        <a href="https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade"><button type="button" class="ghost">Mina appar</button></a>
+        <a href="https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app"><button type="button" class="ghost">Microsofts guide</button></a>
+      </p>
+      <p class="hint">API-behörighet: Microsoft Graph → Delegated → User.Read, Files.ReadWrite, offline_access. Ge admin/användarconsent.</p>
+    </article>
+    <article class="card" style="margin-top:14px">
+      <h3>2. Klistra in Application (client) ID</h3>
+      <form class="stack" id="id-form">
+        <label>Client-id
+          <input id="cid" required placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off"/>
+        </label>
+        <button type="submit">Spara client-id</button>
+        <p class="hint" id="id-err" style="color:#e8b4a4"></p>
+      </form>
+    </article>
+    <article class="card" style="margin-top:14px">
+      <h3>3. Logga in och skriv minnet</h3>
+      <p class="status" id="stat"></p>
+      <p style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" id="login">Logga in med Microsoft</button>
+        <button type="button" class="ghost" id="push">Skriv shared-memory.json</button>
+        <button type="button" class="ghost" id="out">Logga ut</button>
+      </p>
+      <p class="hint" id="msg"></p>
+    </article>
+    <p class="hint">Pack: <a href="./pack.html?id=azure-onedrive-v1">azure-onedrive-v1</a>. Bevakning: ingen hemlighet i sajten. Inte juridisk rådgivning.</p>
+    <footer id="site-footer"></footer>
+  </div>
+  <script type="module">
+    import "./js/shell.js";
+    import { loadBank, mergeBank, addEvent } from "./js/memory.js";
+    import {
+      REDIRECT_URI, getClientId, setClientId,
+      connectAzure, disconnectAzure, savedAccount,
+      pushMemoryToOneDrive, pullMemoryFromOneDrive
+    } from "./js/azure.js";
+    document.getElementById("redir").textContent = REDIRECT_URI;
+    document.getElementById("cid").value = getClientId();
+    function draw() {
+      const acc = savedAccount();
+      const id = getClientId();
+      document.getElementById("stat").innerHTML =
+        `<span><i class="dot ${acc ? "on" : ""}"></i> ${acc ? acc.username : "inte inloggad"}</span>` +
+        `<span>client-id: ${id ? id.slice(0, 8) + "…" : "saknas"}</span>`;
+    }
+    draw();
+    document.getElementById("id-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const err = document.getElementById("id-err");
+      err.textContent = "";
+      try {
+        setClientId(document.getElementById("cid").value);
+        addEvent({ agent: "linnea", kind: "azure", text: "Client-id sparat lokalt" });
+        draw();
+      } catch (ex) {
+        err.textContent = ex.message;
+      }
+    });
+    document.getElementById("login").addEventListener("click", async () => {
+      const msg = document.getElementById("msg");
+      msg.textContent = "Öppnar Microsoft…";
+      try {
+        const acc = await connectAzure();
+        msg.textContent = "Inloggad som " + (acc.username || acc.name);
+        addEvent({ agent: "linnea", kind: "azure", text: "Microsoft-inloggning ok" });
+        const incoming = await pullMemoryFromOneDrive();
+        if (incoming) mergeBank(incoming);
+        draw();
+      } catch (ex) {
+        msg.textContent = ex.message || "Inloggningen avbröts.";
+      }
+    });
+    document.getElementById("push").addEventListener("click", async () => {
+      const msg = document.getElementById("msg");
+      msg.textContent = "Skriver till OneDrive…";
+      try {
+        const bank = loadBank();
+        bank.onedrive.status = "graph-bound";
+        bank.onedrive.bound = true;
+        bank.onedrive.lastExport = new Date().toISOString();
+        await pushMemoryToOneDrive(bank);
+        addEvent({ agent: "linnea", kind: "azure", text: "Graph skrev shared-memory.json" });
+        msg.textContent = "Skrivet till OneDrive/Apps/Linnea/shared-memory.json";
+        draw();
+      } catch (ex) {
+        msg.textContent = ex.message || "Kunde inte skriva.";
+      }
+    });
+    document.getElementById("out").addEventListener("click", async () => {
+      await disconnectAzure();
+      draw();
+      document.getElementById("msg").textContent = "Utloggad.";
+    });
+  </script>
+</body>
+</html>

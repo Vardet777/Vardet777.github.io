@@ -1,0 +1,30 @@
+{
+  "id": "azure-onedrive-v1",
+  "name": "Azure OneDrive",
+  "version": "1.0.0",
+  "kind": "passport",
+  "license": "AllRightsReserved",
+  "language": "sv",
+  "status": "owner-locked",
+  "attribution": "Originaltexter, Vardet777",
+  "source": "original",
+  "owner": "Vardet777",
+  "catalogPosition": 4,
+  "does": "Kopplar ägarens Azure-app som plugin mot Microsoft Graph så Linnea kan skriva shared-memory.json till OneDrive.",
+  "capabilities": ["onedrive_export", "graph_put", "msal_public_client"],
+  "requiredTools": ["azure-app-registration", "msal-browser", "microsoft-graph"],
+  "stillFreeCheckedAt": "2026-09-13",
+  "official": {
+    "registerApp": "https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/CreateApplicationBlade",
+    "appList": "https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade",
+    "docs": "https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app"
+  },
+  "installHints": {
+    "site": "https://vardet777.github.io/free-plugins/azure.html",
+    "mcp": null
+  },
+  "redirectUris": ["https://vardet777.github.io/free-plugins/azure.html"],
+  "platform": "spa",
+  "scopes": ["User.Read", "Files.ReadWrite", "offline_access"],
+  "targetPath": "OneDrive/Apps/Linnea/shared-memory.json"
+}
