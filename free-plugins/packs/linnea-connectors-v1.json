@@ -1,0 +1,20 @@
+{
+  "id": "linnea-connectors-v1",
+  "name": "Linnea AI-kopplingar",
+  "version": "1.0.0",
+  "kind": "passport",
+  "license": "AllRightsReserved",
+  "language": "sv",
+  "status": "owner-locked",
+  "attribution": "Originaltexter, Vardet777",
+  "source": "original",
+  "owner": "Vardet777",
+  "does": "Register över officiella gratisytor där Linnea kan ta emot nycklar eller exportera pack.",
+  "capabilities": ["list_connectors", "store_local_keys", "export_pack_to_runtime"],
+  "innehall": [
+    "API-kö: Groq, OpenRouter, Gemini, Mistral, Cerebras, valfri xAI",
+    "Export: ChatGPT Custom GPT, Claude Skill, Gemini Gem, Grok Bot, Cursor Rules",
+    "Azure Graph via azure.html",
+    "Inga skrapade pluginbutiker"
+  ]
+}
