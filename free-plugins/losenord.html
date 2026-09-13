@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Free-Plugins — byt lösenord</title>
+<link rel="stylesheet" href="./css/site.css"/>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top" id="site-header"></header>
+    <p class="kicker">Lösenord</p>
+    <h1>Byt lösenord på den här enheten.</h1>
+    <form class="stack" id="form" style="max-width:28rem">
+      <label>Nuvarande
+        <input id="old" type="password" required autocomplete="current-password"/>
+      </label>
+      <label>Nytt (minst 8 tecken)
+        <input id="next" type="password" required minlength="8" autocomplete="new-password"/>
+      </label>
+      <label>Bekräfta nytt
+        <input id="confirm" type="password" required minlength="8" autocomplete="new-password"/>
+      </label>
+      <button type="submit">Spara</button>
+      <p class="hint" id="err" style="color:#e8b4a4"></p>
+      <p class="hint" id="ok"></p>
+    </form>
+    <footer id="site-footer"></footer>
+  </div>
+  <script type="module">
+    import "./js/shell.js";
+    import { changePassword } from "./js/auth.js";
+    document.getElementById("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      document.getElementById("err").textContent = "";
+      document.getElementById("ok").textContent = "";
+      try {
+        await changePassword(
+          document.getElementById("old").value,
+          document.getElementById("next").value,
+          document.getElementById("confirm").value
+        );
+        document.getElementById("ok").textContent = "Sparat. Använd det nya lösenordet nästa gång.";
+        e.target.reset();
+      } catch (ex) {
+        document.getElementById("err").textContent = ex.message || "Kunde inte byta.";
+      }
+    });
+  </script>
+</body>
+</html>

@@ -38,7 +38,8 @@ if (footer) {
     Inloggningsvägg på. IP Vardet777. Inte publicerad som produkt.
     <a href="./villkor.html">Villkor</a> ·
     <a href="./integritet.html">Integritet</a> ·
-    <a href="./minne.html">OneDrive-minne</a>
+    <a href="./minne.html">OneDrive-minne</a> ·
+    <a href="./losenord.html">Lösenord</a>
     <button type="button" class="ghost" id="leave-ws">Lås</button>
   `;
   document.getElementById("leave-ws")?.addEventListener("click", leaveWorkshop);

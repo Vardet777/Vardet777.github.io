@@ -5,24 +5,58 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Free-Plugins — inloggning</title>
 <link rel="stylesheet" href="./css/site.css"/>
-<link rel="stylesheet" href="./css/photos.css"/>
 </head>
 <body>
   <main class="gate">
     <img src="./img/linnea-lace.jpg" alt="Linnea" onerror="this.style.opacity=0"/>
     <div class="inner">
       <p class="kicker">Verkstad</p>
-      <h1>Inloggningsvägg</h1>
-      <p>Sajten är inte publicerad som produkt. Öppna bara om du är ägaren.</p>
-      <p class="hint">Ingen kontosäkerhet. En vägg så sidan inte behandlas som live.</p>
-      <p style="margin-top:18px"><button type="button" id="enter">Öppna verkstad</button></p>
-      <p class="hint">Agent: Linnea. Kent är ersatt. Delat minne + röst inne.</p>
+      <h1 id="title">Välj lösenord</h1>
+      <p id="lead">Första gången på den här enheten. Välj ett lösenord bara du kan. Det sparas som hash i webbläsaren — inte i klartext.</p>
+      <form class="stack" id="form" style="margin-top:16px">
+        <label id="pass-label">Nytt lösenord
+          <input id="pass" type="password" required minlength="8" autocomplete="new-password"/>
+        </label>
+        <label id="confirm-wrap">Bekräfta
+          <input id="confirm" type="password" minlength="8" autocomplete="new-password"/>
+        </label>
+        <button type="submit" id="go">Spara och öppna</button>
+        <p class="hint" id="err" style="color:#e8b4a4"></p>
+      </form>
+      <p class="hint">Väggen är per enhet. Använd samma lösenord när du öppnar länken i en ny webbläsare. Inte banklås — statisk sida.</p>
     </div>
   </main>
   <script type="module">
-    import { enterWorkshop, signedIn } from "./js/auth.js";
-    if (signedIn()) location.replace("./index.html");
-    document.getElementById("enter").addEventListener("click", enterWorkshop);
+    import { signedIn, hasPassword, setPassword, unlock, passwordRules } from "./js/auth.js";
+    if (signedIn() && hasPassword()) location.replace("./index.html");
+    const setup = !hasPassword();
+    document.getElementById("title").textContent = setup ? "Välj lösenord" : "Lösenord";
+    document.getElementById("lead").textContent = setup
+      ? "Första gången på den här enheten. Välj minst åtta tecken. Hashen stannar i webbläsaren."
+      : "Skriv lösenordet du valde för den här enheten.";
+    document.getElementById("confirm-wrap").hidden = !setup;
+    document.getElementById("pass-label").firstChild.textContent = setup ? "Nytt lösenord" : "Lösenord";
+    document.getElementById("pass").autocomplete = setup ? "new-password" : "current-password";
+    document.getElementById("go").textContent = setup ? "Spara och öppna" : "Öppna verkstad";
+    const err = document.getElementById("err");
+    document.getElementById("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      err.textContent = "";
+      const pass = document.getElementById("pass").value;
+      const confirm = document.getElementById("confirm").value;
+      try {
+        if (setup) {
+          const bad = passwordRules(pass, confirm);
+          if (bad) throw new Error(bad);
+          await setPassword(pass, confirm);
+        } else {
+          await unlock(pass);
+        }
+        location.href = "./index.html";
+      } catch (ex) {
+        err.textContent = ex.message || "Kunde inte öppna.";
+      }
+    });
   </script>
 </body>
 </html>
