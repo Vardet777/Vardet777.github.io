@@ -19,8 +19,7 @@ header.top .av{
   width:100%;
   display:block;
 }
-.portrait,
-.photo-lace{
+.portrait,.photo-lace{
   background-image:var(--photo-lace);
   background-size:cover;
   background-position:center 12%;

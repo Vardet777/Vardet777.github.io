@@ -7,6 +7,7 @@ const PAGES = [
   ["linnea.html", "Linnea"],
   ["minne.html", "Minne"],
   ["pack.html", "Pack"],
+  ["azure.html", "Azure"],
   ["kopplingar.html", "Kopplingar"],
   ["bevakning.html", "Bevakning"],
   ["om.html", "Om"]
@@ -38,7 +39,7 @@ if (footer) {
     Inloggningsvägg på. IP Vardet777. Inte publicerad som produkt.
     <a href="./villkor.html">Villkor</a> ·
     <a href="./integritet.html">Integritet</a> ·
-    <a href="./minne.html">OneDrive-minne</a> ·
+    <a href="./azure.html">Azure</a> ·
     <a href="./losenord.html">Lösenord</a>
     <button type="button" class="ghost" id="leave-ws">Lås</button>
   `;

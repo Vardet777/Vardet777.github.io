@@ -4,17 +4,29 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Free-Plugins — kopplingar</title>
-<link rel="stylesheet" href="./css/site.css"/>
+<link rel="stylesheet" href="./css/site.css?v=20"/>
+<link rel="stylesheet" href="./css/photos-a.css?v=20"/>
+<link rel="stylesheet" href="./css/photos.css?v=20"/>
 </head>
 <body>
   <div class="wrap">
     <header class="top" id="site-header"></header>
     <p class="kicker">Kopplingar</p>
     <h1>Passport delas. Hemligheter delas inte.</h1>
-    <p class="lead">v1 dokumenterar hur en annan AI ska läsa ett pack. Inga OAuth-flöden är inkopplade.</p>
-    <article class="card"><h3>Grok / xAI</h3><p>Valfri nyckel i webbläsaren på Linnea-sidan. Lokal motor om nyckeln saknas.</p></article>
-    <article class="card"><h3>ChatGPT, Claude, Gemini, Cursor</h3><p>Ingen inloggning här. De får ett pack-passport som text eller JSON.</p></article>
-    <article class="card"><h3>OneDrive</h3><p>Exportfil shared-memory.json till OneDrive/Apps/Linnea/. Live Graph kräver Azure-app.</p></article>
+    <p class="lead">Azure-pluginet är klart att kopplas av ägaren.</p>
+    <article class="card">
+      <h3>Azure / Microsoft Graph</h3>
+      <p>Plugin-sida: <a href="./azure.html">azure.html</a>.</p>
+      <p><a href="https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/CreateApplicationBlade">Skapa app i Azure-portalen</a></p>
+    </article>
+    <article class="card">
+      <h3>Grok / xAI</h3>
+      <p>Valfri nyckel i webbläsaren på Linnea-sidan.</p>
+    </article>
+    <article class="card">
+      <h3>OneDrive</h3>
+      <p>Live Graph startas från <a href="./azure.html">Azure-pluginet</a>.</p>
+    </article>
     <footer id="site-footer"></footer>
   </div>
   <script type="module" src="./js/shell.js"></script>
