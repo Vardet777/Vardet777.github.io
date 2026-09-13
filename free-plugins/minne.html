@@ -4,70 +4,47 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Free-Plugins — delat minne</title>
-<link rel="stylesheet" href="./css/site.css"/>
-<link rel="stylesheet" href="./css/photos.css"/>
+<link rel="stylesheet" href="./css/site.css?v=24"/>
+<link rel="stylesheet" href="./css/photos-a.css?v=24"/>
+<link rel="stylesheet" href="./css/photos.css?v=24"/>
 </head>
 <body>
   <div class="wrap">
     <header class="top" id="site-header"></header>
-    <div class="duo">
-      <div>
-        <p class="kicker">Delat minne</p>
-        <h1>En bank. Alla agenter. OneDrive som kopia.</h1>
-        <p class="lead">Linnea, katalog, skapa och pack läser samma minne. Filen heter <code>shared-memory.json</code> och ska ligga i <code>OneDrive/Apps/Linnea/</code>.</p>
-        <p class="hint">Microsoft Graph är inte inkopplad. På dator: koppla mappen. På iPhone: exportera och lägg filen i Filer → OneDrive.</p>
-        <p class="status" id="stat"></p>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 20px">
-          <button type="button" id="bind">Koppla OneDrive-mapp</button>
-          <button type="button" class="ghost" id="exp">Ladda ner filen</button>
-          <label class="ghost" style="padding:10px 12px;border:1px solid var(--line);border-radius:12px;cursor:pointer">
-            Importera JSON
-            <input id="imp" type="file" accept="application/json,.json" hidden/>
-          </label>
-        </div>
-      </div>
-      <img src="./img/linnea-canon.jpg" alt="Linnea" onerror="this.style.opacity=0"/>
+    <p class="kicker">Delat minne</p>
+    <h1>Google Drive, inte OneDrive.</h1>
+    <p class="lead">Filen heter <code>linnea-drive-memory.json</code> i Drive-mappen <code>Linnea</code>.</p>
+    <p class="status" id="stat"></p>
+    <p class="hint">iPhone skriver inte direkt till Drive utan Google-app. Öppna filen i Drive, eller exportera/importera JSON. Grok kan läsa och uppdatera Drive-filen när du ber om det.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 20px">
+      <a class="card" href="https://drive.google.com/file/d/1FB_MY2jqlDuHErk91x_Ca4SRF_JGy0tP/view" style="padding:12px 16px">Öppna Drive-filen</a>
+      <a class="card" href="https://drive.google.com/drive/folders/1qIxPK46uhkvH5LQpmZYFmF0h9agpOJFE" style="padding:12px 16px">Öppna mappen Linnea</a>
+      <button type="button" id="exp">Ladda ner lokal kopia</button>
+      <label class="ghost" style="padding:10px 12px;border:1px solid var(--line);border-radius:12px;cursor:pointer">Importera JSON<input id="imp" type="file" accept="application/json,.json" hidden/></label>
     </div>
-    <h2>Fakta</h2>
-    <ul class="facts" id="facts"></ul>
-    <h2>Senaste händelser</h2>
-    <ul class="facts" id="events"></ul>
-    <h2>Verk</h2>
-    <ul class="facts" id="works"></ul>
+    <h2>Fakta</h2><ul class="facts" id="facts"></ul>
+    <h2>Senaste händelser</h2><ul class="facts" id="events"></ul>
+    <h2>Verk</h2><ul class="facts" id="works"></ul>
     <footer id="site-footer"></footer>
   </div>
   <script type="module">
     import "./js/shell.js";
-    import { loadBank, exportBank, importFile, bindOneDriveFolder, syncBoundFolder, canBindFolder, ONEDRIVE_PATH } from "./js/memory.js";
-    if (!canBindFolder()) document.getElementById("bind").hidden = true;
+    import { loadBank, exportBank, importFile, DRIVE_FILE } from "./js/memory.js";
     function draw() {
       const bank = loadBank();
       document.getElementById("stat").innerHTML =
         `<span><i class="dot on"></i> ${bank.facts.length} fakta</span>` +
         `<span>${bank.events.length} händelser</span>` +
-        `<span>${bank.works.length} verk</span>` +
-        `<span>OneDrive: ${bank.onedrive.status} → ${ONEDRIVE_PATH}</span>`;
+        `<span>Drive: ${bank.drive?.status || "drive-file"} → ${DRIVE_FILE}</span>`;
       const li = (rows, map) => rows.slice().reverse().slice(0, 20).map(map).join("") || "<li>Tomt.</li>";
-      document.getElementById("facts").innerHTML = li(bank.facts, (f) => `<li>${f.text} <span class="hint">${f.agent} · ${f.at}</span></li>`);
+      document.getElementById("facts").innerHTML = li(bank.facts, (f) => `<li>${f.text}</li>`);
       document.getElementById("events").innerHTML = li(bank.events, (e) => `<li>${e.agent} / ${e.kind}: ${e.text}</li>`);
       document.getElementById("works").innerHTML = li(bank.works, (w) => `<li>${w.kind || "verk"} · ${w.name || ""}</li>`);
     }
     draw();
-    syncBoundFolder().then(draw).catch(() => {});
     document.getElementById("exp").addEventListener("click", () => { exportBank(); draw(); });
-    document.getElementById("bind").addEventListener("click", async () => {
-      try {
-        await bindOneDriveFolder();
-        draw();
-      } catch (err) {
-        alert(err.message || "Kunde inte koppla mappen.");
-      }
-    });
     document.getElementById("imp").addEventListener("change", async (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      await importFile(file);
-      draw();
+      const file = e.target.files?.[0]; if (!file) return; await importFile(file); draw();
     });
   </script>
 </body>
