@@ -4,9 +4,9 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <title>Free-Plugins — Linnea</title>
-<link rel="stylesheet" href="./css/site.css?v=22"/>
-<link rel="stylesheet" href="./css/photos-a.css?v=22"/>
-<link rel="stylesheet" href="./css/photos.css?v=22"/>
+<link rel="stylesheet" href="./css/site.css?v=23"/>
+<link rel="stylesheet" href="./css/photos-a.css?v=23"/>
+<link rel="stylesheet" href="./css/photos.css?v=23"/>
 </head>
 <body>
   <div class="wrap">
@@ -16,127 +16,102 @@
     <div class="stage">
       <div class="portrait photo-lace" role="img" aria-label="Linnea"></div>
       <div class="card">
-        <div class="status">
-          <span><i class="dot" id="vdot"></i> röst</span>
-          <span><i class="dot" id="mdot"></i> minne</span>
-          <span id="src">lokal service</span>
-        </div>
-        <div class="log" id="log">
-          <div class="msg linnea">Hej. Jag är Linnea. Tryck den orange knappen Prata så läser jag upp. Ingen nyckel behövs.</div>
-        </div>
-        <form class="stack" id="f" style="margin-top:12px">
-          <input id="t" placeholder="skriv här eller tryck Prata" autocomplete="off"/>
-        </form>
+        <div class="status"><span><i class="dot on" id="vdot"></i> röst</span><span><i class="dot" id="mdot"></i> minne</span><span id="src">lokal service</span></div>
+        <div class="log" id="log"><div class="msg linnea">Hej. Jag är Linnea. Tryck Prata så läser jag upp. Ingen nyckel behövs.</div></div>
+        <form class="stack" id="f" style="margin-top:12px"><input id="t" placeholder="skriv här eller tryck Prata" autocomplete="off"/></form>
         <div class="talk-dock">
           <button type="button" id="talk">Prata</button>
           <button type="submit" form="f">Skicka</button>
           <button type="button" class="ghost" id="mic">Lyssna</button>
         </div>
-        <p class="hint">Service fungerar utan nyckel. Groq är valfritt.</p>
-        <form class="stack" id="groq-form">
-          <label>Groq-nyckel (valfritt)
-            <input id="groq-key" type="password" autocomplete="off" placeholder="gsk_…"/>
-          </label>
-          <button type="submit" class="ghost">Spara Groq</button>
-        </form>
-        <p class="hint">Hämta på <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a>. Klistra in i rutan. Stannar i den här Safari.</p>
+        <p class="hint" id="hint">Service fungerar utan nyckel.</p>
       </div>
     </div>
     <footer id="site-footer"></footer>
   </div>
+  <script>
+    (function () {
+      var log = document.getElementById("log");
+      var input = document.getElementById("t");
+      var hint = document.getElementById("hint");
+      function lastText() {
+        var nodes = log.querySelectorAll(".msg.linnea");
+        var n = nodes[nodes.length - 1];
+        return (n && n.textContent) || "Hej. Jag är Linnea.";
+      }
+      function add(role, text) {
+        var d = document.createElement("div");
+        d.className = "msg " + role;
+        d.textContent = text;
+        log.appendChild(d);
+        d.scrollIntoView({ block: "end" });
+      }
+      function speak(text) {
+        if (!window.speechSynthesis) { if (hint) hint.textContent = "Den här webbläsaren har ingen uppläsning."; return; }
+        var clean = String(text || "").replace(/\s+/g, " ").trim();
+        if (!clean) return;
+        try { speechSynthesis.cancel(); } catch (e) {}
+        try { speechSynthesis.resume(); } catch (e) {}
+        var u = new SpeechSynthesisUtterance(clean.slice(0, 900));
+        u.lang = "sv-SE"; u.rate = 0.98; u.pitch = 1.03;
+        var voices = [];
+        try { voices = speechSynthesis.getVoices() || []; } catch (e) {}
+        var pick = null;
+        for (var i = 0; i < voices.length; i++) {
+          var v = voices[i];
+          var blob = ((v.name || "") + " " + (v.lang || "")).toLowerCase();
+          if (/evie|zelda|oskar|ingmar|erik|magnus/.test(blob)) continue;
+          if (/^sv/.test(v.lang || "") && /elin|klara|alva|ebba|sofie|freja/.test(blob)) { pick = v; break; }
+          if (!pick && /^sv/.test(v.lang || "")) pick = v;
+        }
+        if (pick) u.voice = pick;
+        speechSynthesis.speak(u);
+      }
+      window.__linneaSpeak = speak;
+      window.__linneaAdd = add;
+      document.getElementById("talk").addEventListener("click", function () { speak(lastText()); });
+      document.getElementById("f").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var text = (input.value || "").trim();
+        input.value = "";
+        if (!text) { speak(lastText()); return; }
+        add("you", text);
+        if (typeof window.__linneaAnswer === "function") window.__linneaAnswer(text);
+        else { var r = "Jag hörde: " + text; add("linnea", r); speak(r); }
+      });
+      document.getElementById("mic").addEventListener("click", function () {
+        var Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!Rec) { add("linnea", "Ingen diktering. Skriv i stället."); speak("Ingen diktering. Skriv i stället."); return; }
+        var rec = new Rec(); rec.lang = "sv-SE";
+        rec.onresult = function (ev) { input.value = ev.results[0][0].transcript; document.getElementById("f").requestSubmit(); };
+        try { rec.start(); } catch (err) { add("linnea", "Mikrofonen startade inte."); }
+      });
+    })();
+  </script>
   <script type="module">
     import "./js/shell.js";
     import { loadCatalog } from "./js/catalog.js";
-    import { loadAllPacks } from "./js/pack.js";
     import { answer } from "./js/linnea.js";
-    import { getKey, setKey, liveQueue } from "./js/providers.js";
+    import { liveQueue } from "./js/providers.js";
     import { loadBank } from "./js/memory.js";
-    import {
-      speak, stopSpeak, listenOnce, voiceWanted, setVoiceWanted,
-      canListen, holdAudioSession, whenVoicesReady, voiceLabel
-    } from "./js/voice.js";
-    const log = document.getElementById("log");
-    const input = document.getElementById("t");
-    const talk = document.getElementById("talk");
     let catalog = { items: [] };
     let packs = [];
-    function lastLinnea() {
-      const nodes = [...log.querySelectorAll(".msg.linnea")];
-      return nodes.pop()?.textContent || "Hej. Jag är Linnea.";
-    }
-    function add(role, text) {
-      const d = document.createElement("div");
-      d.className = "msg " + role;
-      d.textContent = text;
-      log.appendChild(d);
-      d.scrollIntoView({ block: "end" });
-    }
-    function markVoice() {
-      document.getElementById("vdot").classList.toggle("on", voiceWanted());
-      const q = liveQueue();
-      document.getElementById("src").textContent =
-        (q.length ? "kö " + q.map((p) => p.label).join(" → ") : "lokal service") +
-        " · " + voiceLabel();
-    }
-    talk.addEventListener("click", (e) => {
-      e.preventDefault();
-      holdAudioSession();
-      setVoiceWanted(true);
-      speak(lastLinnea());
-      markVoice();
-    });
-    document.getElementById("f").addEventListener("submit", (e) => {
-      e.preventDefault();
-      holdAudioSession();
-      const text = input.value.trim();
-      input.value = "";
-      send(text);
-    });
-    document.getElementById("mic").addEventListener("click", () => {
-      if (!canListen()) {
-        add("linnea", "Den här Safari-versionen har ingen diktering. Skriv, eller använd tangentbordets mikrofon.");
-        return;
-      }
-      listenOnce({
-        onStart() { document.getElementById("mic").classList.add("live"); },
-        onResult(text) {
-          document.getElementById("mic").classList.remove("live");
-          input.value = text;
-          send(text);
-        },
-        onError() { document.getElementById("mic").classList.remove("live"); }
-      });
-    });
-    document.getElementById("groq-key").value = getKey("groq");
-    document.getElementById("groq-form").addEventListener("submit", (e) => {
-      e.preventDefault();
-      setKey("groq", document.getElementById("groq-key").value);
-      markVoice();
-      add("linnea", getKey("groq") ? "Groq sparad i den här Safari." : "Groq borttagen. Jag kör lokalt.");
-    });
-    async function send(text) {
-      if (!text) return;
-      add("you", text);
+    window.__linneaAnswer = async function (text) {
       try {
         const out = await answer(text, catalog, packs);
-        add("linnea", out.text);
-        document.getElementById("mdot").classList.add("on");
-        speak(out.text);
-        markVoice();
+        window.__linneaAdd("linnea", out.text);
+        window.__linneaSpeak(out.text);
       } catch {
-        add("linnea", "Jag är här. Tryck Prata eller skriv igen.");
-        speak("Jag är här. Tryck Prata eller skriv igen.");
+        window.__linneaAdd("linnea", "Jag är här. Tryck Prata.");
+        window.__linneaSpeak("Jag är här. Tryck Prata.");
       }
-    }
-    markVoice();
-    whenVoicesReady().then(markVoice);
+    };
     try {
       catalog = await loadCatalog();
-      const packRows = await loadAllPacks(catalog);
-      packs = packRows.map((r) => r.pack).filter(Boolean);
+      const { loadAllPacks } = await import("./js/pack.js");
+      packs = (await loadAllPacks(catalog)).map((r) => r.pack).filter(Boolean);
       const bank = loadBank();
       document.getElementById("mdot").classList.toggle("on", bank.facts.length + bank.events.length > 0);
-      markVoice();
     } catch {}
   </script>
 </body>
