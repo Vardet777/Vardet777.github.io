@@ -7,6 +7,8 @@ const PAGES = [
   ["linnea.html", "Linnea"],
   ["minne.html", "Minne"],
   ["pack.html", "Pack"],
+  ["kopplingar.html", "Kopplingar"],
+  ["bevakning.html", "Bevakning"],
   ["om.html", "Om"]
 ];
 

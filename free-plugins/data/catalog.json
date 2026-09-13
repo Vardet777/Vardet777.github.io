@@ -1,27 +1,49 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "published": false,
   "loginWall": true,
   "agent": "Linnea",
   "replaced": "Kent",
-  "note": "Ingen publik webbadress. Öppna artifacts/free-plugins-site/login.html. Påhittade tredjeposts ingår inte.",
+  "ads": false,
   "items": [
     {
       "id": "free-plugins-hem-v1",
       "name": "Free-Plugins hem",
-      "kind": "pack",
+      "kind": "passport",
       "gratis": true,
       "betal": false,
       "position": 1,
       "category": "hem",
       "tags": ["sajt", "repo", "pack", "linnea"],
-      "text": "Pekar ut sajten, innehållet och repot. Inte publicerad.",
-      "cover": "./img/skull-fire.jpg",
+      "text": "Pekar ut sajten, innehållet och repot. Inte publicerad som produkt.",
       "pack": "packs/free-plugins-hem-v1.json",
-      "official": null,
+      "publicUrl": null
+    },
+    {
+      "id": "husmanskost-v1",
+      "name": "Husmanskost",
+      "kind": "cookbook",
+      "gratis": true,
+      "betal": false,
+      "position": 2,
+      "category": "kokbok",
+      "tags": ["recept", "original", "utkast"],
+      "text": "Tre originalrecept. Ingen känd kock. Status draft.",
+      "pack": "packs/husmanskost-v1.json",
+      "publicUrl": null
+    },
+    {
+      "id": "pack-passport-v1",
+      "name": "Pack-passport",
+      "kind": "passport",
+      "gratis": true,
+      "betal": false,
+      "position": 3,
+      "category": "schema",
+      "tags": ["schema", "passport", "v1"],
+      "text": "Reglerna för pack i v1. Presentation, inte körbar kod.",
+      "pack": "packs/pack-passport-v1.json",
       "publicUrl": null
     }
-  ],
-  "ads": false,
-  "sharedMemory": "local+onedrive-export"
+  ]
 }
