@@ -4,9 +4,9 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <title>Free-Plugins — Linnea</title>
-<link rel="stylesheet" href="./css/site.css?v=23"/>
-<link rel="stylesheet" href="./css/photos-a.css?v=23"/>
-<link rel="stylesheet" href="./css/photos.css?v=23"/>
+<link rel="stylesheet" href="./css/site.css?v=24"/>
+<link rel="stylesheet" href="./css/photos-a.css?v=24"/>
+<link rel="stylesheet" href="./css/photos.css?v=24"/>
 </head>
 <body>
   <div class="wrap">
@@ -16,9 +16,17 @@
     <div class="stage">
       <div class="portrait photo-lace" role="img" aria-label="Linnea"></div>
       <div class="card">
-        <div class="status"><span><i class="dot on" id="vdot"></i> röst</span><span><i class="dot" id="mdot"></i> minne</span><span id="src">lokal service</span></div>
-        <div class="log" id="log"><div class="msg linnea">Hej. Jag är Linnea. Tryck Prata så läser jag upp. Ingen nyckel behövs.</div></div>
-        <form class="stack" id="f" style="margin-top:12px"><input id="t" placeholder="skriv här eller tryck Prata" autocomplete="off"/></form>
+        <div class="status">
+          <span><i class="dot on" id="vdot"></i> röst</span>
+          <span><i class="dot" id="mdot"></i> minne</span>
+          <span id="src">lokal service</span>
+        </div>
+        <div class="log" id="log">
+          <div class="msg linnea">Hej. Jag är Linnea. Tryck Prata så läser jag upp. Ingen nyckel behövs.</div>
+        </div>
+        <form class="stack" id="f" style="margin-top:12px">
+          <input id="t" placeholder="skriv här eller tryck Prata" autocomplete="off"/>
+        </form>
         <div class="talk-dock">
           <button type="button" id="talk">Prata</button>
           <button type="submit" form="f">Skicka</button>
@@ -46,14 +54,30 @@
         log.appendChild(d);
         d.scrollIntoView({ block: "end" });
       }
+      function holdAudioSession() {
+        if (!window.speechSynthesis) return;
+        try { speechSynthesis.getVoices(); } catch (e) {}
+        try { speechSynthesis.resume(); } catch (e) {}
+        try {
+          var hold = new SpeechSynthesisUtterance(".");
+          hold.lang = "sv-SE";
+          hold.volume = 0;
+          speechSynthesis.speak(hold);
+        } catch (e) {}
+      }
       function speak(text) {
-        if (!window.speechSynthesis) { if (hint) hint.textContent = "Den här webbläsaren har ingen uppläsning."; return; }
+        if (!window.speechSynthesis) {
+          if (hint) hint.textContent = "Den här webbläsaren har ingen uppläsning.";
+          return;
+        }
         var clean = String(text || "").replace(/\s+/g, " ").trim();
         if (!clean) return;
         try { speechSynthesis.cancel(); } catch (e) {}
         try { speechSynthesis.resume(); } catch (e) {}
         var u = new SpeechSynthesisUtterance(clean.slice(0, 900));
-        u.lang = "sv-SE"; u.rate = 0.98; u.pitch = 1.03;
+        u.lang = "sv-SE";
+        u.rate = 0.98;
+        u.pitch = 1.03;
         var voices = [];
         try { voices = speechSynthesis.getVoices() || []; } catch (e) {}
         var pick = null;
@@ -66,25 +90,44 @@
         }
         if (pick) u.voice = pick;
         speechSynthesis.speak(u);
+        setTimeout(function () { try { speechSynthesis.resume(); } catch (e) {} }, 4000);
       }
       window.__linneaSpeak = speak;
       window.__linneaAdd = add;
-      document.getElementById("talk").addEventListener("click", function () { speak(lastText()); });
+      document.getElementById("talk").addEventListener("click", function () {
+        holdAudioSession();
+        speak(lastText());
+      });
       document.getElementById("f").addEventListener("submit", function (e) {
         e.preventDefault();
         var text = (input.value || "").trim();
         input.value = "";
         if (!text) { speak(lastText()); return; }
         add("you", text);
-        if (typeof window.__linneaAnswer === "function") window.__linneaAnswer(text);
-        else { var r = "Jag hörde: " + text; add("linnea", r); speak(r); }
+        if (typeof window.__linneaAnswer === "function") {
+          window.__linneaAnswer(text);
+        } else {
+          var reply = "Jag hörde: " + text + ". Tryck Prata om du vill höra svaret.";
+          add("linnea", reply);
+          speak(reply);
+        }
       });
       document.getElementById("mic").addEventListener("click", function () {
         var Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!Rec) { add("linnea", "Ingen diktering. Skriv i stället."); speak("Ingen diktering. Skriv i stället."); return; }
-        var rec = new Rec(); rec.lang = "sv-SE";
-        rec.onresult = function (ev) { input.value = ev.results[0][0].transcript; document.getElementById("f").requestSubmit(); };
-        try { rec.start(); } catch (err) { add("linnea", "Mikrofonen startade inte."); }
+        if (!Rec) {
+          add("linnea", "Ingen diktering i den här Safari. Skriv i stället.");
+          speak("Ingen diktering i den här Safari. Skriv i stället.");
+          return;
+        }
+        var rec = new Rec();
+        rec.lang = "sv-SE";
+        rec.onresult = function (ev) {
+          input.value = ev.results[0][0].transcript;
+          document.getElementById("f").requestSubmit();
+        };
+        try { rec.start(); } catch (err) {
+          add("linnea", "Mikrofonen startade inte.");
+        }
       });
     })();
   </script>
@@ -101,18 +144,22 @@
         const out = await answer(text, catalog, packs);
         window.__linneaAdd("linnea", out.text);
         window.__linneaSpeak(out.text);
+        const src = document.getElementById("src");
+        const q = liveQueue();
+        if (src) src.textContent = q.length ? "kö " + q.map((p) => p.label).join(" → ") : "lokal service";
       } catch {
-        window.__linneaAdd("linnea", "Jag är här. Tryck Prata.");
-        window.__linneaSpeak("Jag är här. Tryck Prata.");
+        window.__linneaAdd("linnea", "Jag är här. Skriv igen eller tryck Prata.");
+        window.__linneaSpeak("Jag är här. Skriv igen eller tryck Prata.");
       }
     };
     try {
       catalog = await loadCatalog();
       const { loadAllPacks } = await import("./js/pack.js");
-      packs = (await loadAllPacks(catalog)).map((r) => r.pack).filter(Boolean);
+      const packRows = await loadAllPacks(catalog);
+      packs = packRows.map((r) => r.pack).filter(Boolean);
       const bank = loadBank();
       document.getElementById("mdot").classList.toggle("on", bank.facts.length + bank.events.length > 0);
-    } catch {}
+    } catch { /* Prata fungerar redan */ }
   </script>
 </body>
 </html>
