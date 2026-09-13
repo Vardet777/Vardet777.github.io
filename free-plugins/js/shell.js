@@ -23,7 +23,7 @@ const nav = PAGES.map(([href, label]) => {
 const header = document.getElementById("site-header");
 if (header) {
   header.innerHTML = `
-    <img class="av" alt="Linnea" src="./img/avatar.jpg" onerror="this.src='./img/linnea.jpg'"/>
+    <div class="av" role="img" aria-label="Linnea"></div>
     <div>
       <strong>Free-Plugins</strong>
       <span>Linnea · delat minne · verkstad</span>

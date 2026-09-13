@@ -4,20 +4,23 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Free-Plugins — inloggning</title>
-<link rel="stylesheet" href="./css/site.css"/>
-<link rel="stylesheet" href="./css/photos-a.css"/>
-<link rel="stylesheet" href="./css/photos-b.css"/>
-<link rel="stylesheet" href="./css/photos-c.css"/>
-<link rel="stylesheet" href="./css/photos.css"/>
+<link rel="stylesheet" href="./css/site.css?v=18"/>
+<link rel="stylesheet" href="./css/photos-a.css?v=18"/>
+<link rel="stylesheet" href="./css/photos-b.css?v=18"/>
+<link rel="stylesheet" href="./css/photos-c.css?v=18"/>
+<link rel="stylesheet" href="./css/photos.css?v=18"/>
 </head>
 <body>
   <main class="gate">
-    <img src="./img/linnea-lace.jpg" alt="Linnea" onerror="this.style.opacity=0"/>
+    <div class="gate-photo" role="img" aria-label="Linnea"></div>
     <div class="inner">
       <p class="kicker">Verkstad</p>
       <h1 id="title">Välj lösenord</h1>
-      <p id="lead">Första gången på den här enheten. Välj ett lösenord bara du kan.</p>
+      <p id="lead">Första gången på den här enheten. Välj ett lösenord bara du kan. Det sparas som hash i webbläsaren — inte i klartext.</p>
       <form class="stack" id="form" style="margin-top:16px">
+        <label id="old-wrap" hidden>Nuvarande lösenord
+          <input id="old" type="password" autocomplete="current-password"/>
+        </label>
         <label id="pass-label">Nytt lösenord
           <input id="pass" type="password" required minlength="8" autocomplete="new-password"/>
         </label>
@@ -27,21 +30,23 @@
         <button type="submit" id="go">Spara och öppna</button>
         <p class="hint" id="err" style="color:#e8b4a4"></p>
       </form>
-      <p class="hint">Väggen är per enhet. Inte banklås — statisk sida.</p>
+      <p class="hint">Väggen är per enhet. Använd samma lösenord när du öppnar länken i en ny webbläsare. Inte banklås — statisk sida.</p>
     </div>
   </main>
   <script type="module">
     import { signedIn, hasPassword, setPassword, unlock, passwordRules } from "./js/auth.js";
     if (signedIn() && hasPassword()) location.replace("./index.html");
+
     const setup = !hasPassword();
     document.getElementById("title").textContent = setup ? "Välj lösenord" : "Lösenord";
     document.getElementById("lead").textContent = setup
-      ? "Första gången på den här enheten. Välj minst åtta tecken."
+      ? "Första gången på den här enheten. Välj minst åtta tecken. Hashen stannar i webbläsaren."
       : "Skriv lösenordet du valde för den här enheten.";
     document.getElementById("confirm-wrap").hidden = !setup;
     document.getElementById("pass-label").firstChild.textContent = setup ? "Nytt lösenord" : "Lösenord";
     document.getElementById("pass").autocomplete = setup ? "new-password" : "current-password";
     document.getElementById("go").textContent = setup ? "Spara och öppna" : "Öppna verkstad";
+
     const err = document.getElementById("err");
     document.getElementById("form").addEventListener("submit", async (e) => {
       e.preventDefault();
