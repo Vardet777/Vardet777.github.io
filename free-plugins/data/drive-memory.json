@@ -1,11 +1,12 @@
 {
   "backend": "google-drive",
   "owner": "Vardet777",
-  "folder": "Linnea",
-  "folderId": "1qIxPK46uhkvH5LQpmZYFmF0h9agpOJFE",
-  "folderUrl": "https://drive.google.com/drive/folders/1qIxPK46uhkvH5LQpmZYFmF0h9agpOJFE",
-  "fileName": "linnea-drive-memory.json",
-  "fileId": "1FB_MY2jqlDuHErk91x_Ca4SRF_JGy0tP",
-  "fileUrl": "https://drive.google.com/file/d/1FB_MY2jqlDuHErk91x_Ca4SRF_JGy0tP/view",
-  "replaced": "OneDrive/Apps/Linnea/shared-memory.json"
+  "folder": "Gemensamt-AI-minne",
+  "folderId": "1ncKVnykpC7XTsMAKHVqn6L43_kEhygXM",
+  "folderUrl": "https://drive.google.com/drive/folders/1ncKVnykpC7XTsMAKHVqn6L43_kEhygXM",
+  "fileName": "gemensamt-ai-minne.json",
+  "fileId": "1EiFXug8dHGyRJmRYRPn_dtP3N2J1QXbJ",
+  "fileUrl": "https://drive.google.com/file/d/1EiFXug8dHGyRJmRYRPn_dtP3N2J1QXbJ/view",
+  "docUrl": "https://docs.google.com/document/d/1xGtI2oetkIBMW2QtH1aH7xuNC3nSs9hiUXrYN899uhc/edit",
+  "replaced": ["Outlook", "OneDrive"]
 }
