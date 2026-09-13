@@ -1,17 +1,17 @@
 const KEY = "fp.shared.memory";
 export const AGENTS = ["linnea", "katalog", "skapa", "pack"];
-export const DRIVE_FOLDER = "Linnea";
-export const DRIVE_FOLDER_ID = "1qIxPK46uhkvH5LQpmZYFmF0h9agpOJFE";
-export const DRIVE_FILE_ID = "1FB_MY2jqlDuHErk91x_Ca4SRF_JGy0tP";
-export const DRIVE_FILE = "linnea-drive-memory.json";
-export const DRIVE_FILE_URL = "https://drive.google.com/file/d/1FB_MY2jqlDuHErk91x_Ca4SRF_JGy0tP/view";
-export const DRIVE_FOLDER_URL = "https://drive.google.com/drive/folders/1qIxPK46uhkvH5LQpmZYFmF0h9agpOJFE";
-export const ONEDRIVE_PATH = "Google Drive/Linnea/linnea-drive-memory.json";
+export const DRIVE_FOLDER = "Gemensamt-AI-minne";
+export const DRIVE_FOLDER_ID = "1ncKVnykpC7XTsMAKHVqn6L43_kEhygXM";
+export const DRIVE_FILE_ID = "1EiFXug8dHGyRJmRYRPn_dtP3N2J1QXbJ";
+export const DRIVE_FILE = "gemensamt-ai-minne.json";
+export const DRIVE_FILE_URL = "https://drive.google.com/file/d/1EiFXug8dHGyRJmRYRPn_dtP3N2J1QXbJ/view";
+export const DRIVE_FOLDER_URL = "https://drive.google.com/drive/folders/1ncKVnykpC7XTsMAKHVqn6L43_kEhygXM";
+export const ONEDRIVE_PATH = "Google Drive/Gemensamt-AI-minne/gemensamt-ai-minne.json";
 function now() { return new Date().toISOString(); }
 function emptyBank() {
   return {
-    version: 2, owner: "Vardet777", updatedAt: null, backend: "google-drive",
-    drive: { folder: DRIVE_FOLDER, folderId: DRIVE_FOLDER_ID, fileId: DRIVE_FILE_ID, fileName: DRIVE_FILE, fileUrl: DRIVE_FILE_URL, folderUrl: DRIVE_FOLDER_URL, status: "drive-file", bound: true, note: "Delat minne i Google Drive. Enheten cachar lokalt." },
+    version: 3, owner: "Vardet777", updatedAt: null, backend: "google-drive",
+    drive: { folder: DRIVE_FOLDER, folderId: DRIVE_FOLDER_ID, fileId: DRIVE_FILE_ID, fileName: DRIVE_FILE, fileUrl: DRIVE_FILE_URL, folderUrl: DRIVE_FOLDER_URL, status: "canonical", bound: true, note: "Gemensamt minne i Google Drive. Enheten cachar lokalt." },
     onedrive: { target: ONEDRIVE_PATH, status: "replaced-by-drive", lastExport: null, bound: false, note: "OneDrive är inte backend." },
     facts: [], events: [], works: []
   };
@@ -69,7 +69,7 @@ export function contextForAgent(agent) {
 }
 export function canBindFolder() { return false; }
 export async function bindOneDriveFolder() { throw new Error("OneDrive är ersatt av Google Drive."); }
-export async function syncBoundFolder() { return { ok: false, status: "drive-file" }; }
+export async function syncBoundFolder() { return { ok: false, status: "canonical" }; }
 export function mergeBank(incoming) {
   const cur = loadBank();
   const src = incoming && typeof incoming === "object" ? incoming : {};
