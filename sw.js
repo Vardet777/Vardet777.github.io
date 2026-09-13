@@ -1,4 +1,4 @@
-const CACHE = "linnea-shell-v15";
+const CACHE = "linnea-shell-v16";
 const SHELL = [
   "./",
   "./index.html",

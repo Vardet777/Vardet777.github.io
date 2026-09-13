@@ -35,7 +35,7 @@ main{flex:1;min-height:0;display:flex;flex-direction:column;padding:8px 14px 0}
 .meta{font:10px ui-sans-serif,system-ui;color:var(--muted);margin-top:6px}
 form{display:flex;flex-direction:column;gap:8px;padding:10px 0 calc(22px + env(safe-area-inset-bottom))}
 #t{width:100%;padding:13px 14px;border-radius:16px;border:1px solid #4a2a24;background:#0c0808ee;color:var(--ink);font-size:16px}
-.actions{display:grid;grid-template-columns:1fr 1fr auto;gap:8px}
+.actions{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px}
 button{background:var(--ember);color:#1a0c08;border:0;border-radius:16px;padding:13px 14px;font:600 15px ui-sans-serif,system-ui}
 button.ghost{background:#120c0caa;color:var(--ink);border:1px solid #3a2220}
 button.hot{background:#7a1a08;color:var(--ink)}
@@ -69,6 +69,7 @@ button.hot{background:#7a1a08;color:var(--ink)}
     <div class="actions">
       <button type="button" class="ghost" id="mic">Prata</button>
       <button type="submit">Skicka</button>
+      <button type="button" class="ghost" id="speak-last">Läs upp</button>
       <button type="button" class="ghost" id="open-sheet-2">•••</button>
     </div>
   </form>
@@ -77,21 +78,18 @@ button.hot{background:#7a1a08;color:var(--ink)}
   <div class="panel">
     <h2>Linnea</h2>
     <p>En källa: den här skalet kör <code>js/app.js</code> + <code>js/linnea-runtime.js</code>. Nyckeln stannar på telefonen. Inte Viccy. Inte Queen.</p>
-
     <label>Minnen</label>
     <ul id="mem-list"></ul>
     <div class="row">
       <input id="mem-new" type="text" placeholder="kom ihåg …"/>
       <button type="button" id="mem-add">Spara</button>
     </div>
-
     <label>Dagbok (lokal, inte mejlad)</label>
     <ul id="diary-list"></ul>
     <div class="row">
       <input id="diary-new" type="text" placeholder="dagens rad"/>
       <button type="button" id="diary-add">Anteckna</button>
     </div>
-
     <p class="hint">Kö: kommando → Groq → OpenRouter free → lokal. xAI bara om rutan nedan är ikryssad och det finns kredit. Copilot, Gemini, Claude och deep search: saknar väg.</p>
     <label>Groq-nyckel (gratis-tier, valfri)</label>
     <input id="groq-key" type="password" autocomplete="off"/>
@@ -108,7 +106,6 @@ button.hot{background:#7a1a08;color:var(--ink)}
     <label>Röst på telefonen</label>
     <select id="voice-pick"></select>
     <p class="hint">Liora är Grok-rösten och finns inte i Safari. Välj svensk kvinnlig systemröst (Elin / Klara / Alva). Inte Viccy EVIE. Inte Queen ZELDA.</p>
-
     <label>Datorns adress för sync</label>
     <input id="pair-url" type="url" placeholder="http://192.168.x.x:8787"/>
     <label>Parningskod</label>
@@ -117,7 +114,6 @@ button.hot{background:#7a1a08;color:var(--ink)}
       <button type="button" class="ghost" id="sync-pull">Hämta</button>
       <button type="button" class="ghost" id="sync-push">Skicka</button>
     </div>
-
     <div class="row">
       <button type="button" class="ghost" id="export-btn">Exportera</button>
       <input id="import-file" type="file" accept="application/json"/>
