@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Free-Plugins — inloggning</title>
+<link rel="stylesheet" href="./css/site.css"/>
+</head>
+<body>
+  <main class="gate">
+    <p class="kicker">Verkstad</p>
+    <h1>Inloggningsvägg</h1>
+    <p>Sajten är inte publicerad som produkt. Det här är en förhandsvisning. Öppna bara om du är ägaren.</p>
+    <p class="hint">Det här är ingen kontosäkerhet. Det är en vägg så sidan inte behandlas som live-produkt.</p>
+    <p style="margin-top:18px"><button type="button" id="enter">Öppna verkstad</button></p>
+    <p class="hint">Agent: Linnea. Kent är ersatt. Appen byggs efter sajten.</p>
+  </main>
+  <script type="module">
+    import { enterWorkshop, signedIn } from "./js/auth.js";
+    if (signedIn()) location.replace("./index.html");
+    document.getElementById("enter").addEventListener("click", enterWorkshop);
+  </script>
+</body>
+</html>

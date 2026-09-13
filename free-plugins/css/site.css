@@ -1,0 +1,51 @@
+:root{
+  --bg:#100c0b;--paper:#1a1412;--ink:#f4ebe4;--muted:#b39a90;
+  --ember:#e07a4a;--line:#3a2722;--ok:#c4e0b8;
+  --serif:"Iowan Old Style",Georgia,serif;
+  --sans:ui-sans-serif,system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:17px/1.5 var(--serif)}
+body{background:
+  radial-gradient(ellipse at 12% -10%,#5a241655,transparent 42%),
+  radial-gradient(ellipse at 90% 120%,#e07a4a18,transparent 40%),
+  var(--bg)}
+a{color:var(--ember);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 64px}
+header.top{display:flex;align-items:center;gap:14px;padding:18px 0 8px;border-bottom:1px solid var(--line);margin-bottom:28px;flex-wrap:wrap}
+header.top img.av{width:52px;height:52px;border-radius:50%;object-fit:cover;object-position:center 18%;border:1px solid var(--ember)}
+header.top strong{display:block;font-size:20px;color:var(--ember)}
+header.top span{display:block;font:12px var(--sans);color:var(--muted)}
+nav.main{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+nav.main a{font:12px var(--sans);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:#160f0dcc}
+nav.main a.on,nav.main a:hover{border-color:var(--ember);color:var(--ember);text-decoration:none}
+.kicker{font:12px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+h1{font-size:40px;line-height:1.1;margin:0 0 12px;color:var(--ember)}
+h2{font-size:22px;margin:28px 0 10px}
+p.lead{font-size:19px;color:#eadfd7;max-width:38rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:22px 0}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:16px}
+.card h3{margin:0 0 6px;font-size:18px;color:var(--ember)}
+.card p,.hint{color:var(--muted);font:14px/1.45 var(--sans)}
+.badge{display:inline-block;font:11px var(--sans);border:1px solid var(--line);border-radius:999px;padding:2px 8px;margin-right:6px;color:var(--muted)}
+.badge.gratis{border-color:#4a6a40;color:var(--ok)}
+.badge.betal{border-color:#6a4038;color:#e8b4a4}
+.ad{min-height:88px;border:1px dashed var(--line);border-radius:16px;display:flex;align-items:center;justify-content:center;color:var(--muted);font:13px var(--sans);margin:16px 0}
+form.stack,fieldset{display:flex;flex-direction:column;gap:8px;border:0;padding:0;margin:0}
+label{font:12px var(--sans);color:var(--muted)}
+input,select,textarea,button{font:16px var(--sans);border-radius:12px;border:1px solid var(--line);background:#120c0b;color:var(--ink);padding:10px 12px}
+textarea{min-height:90px;resize:vertical}
+button{background:var(--ember);color:#1a0c08;border:0;font-weight:600;cursor:pointer}
+button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.log{display:flex;flex-direction:column;gap:10px;min-height:240px}
+.msg{max-width:86%;padding:12px 14px;border-radius:16px;white-space:pre-wrap}
+.msg.linnea{align-self:flex-start;background:#241614}
+.msg.you{align-self:flex-end;background:#3a1b16}
+footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font:12px var(--sans);color:var(--muted)}
+.gate{max-width:420px;margin:12vh auto;padding:28px;background:var(--paper);border:1px solid var(--line);border-radius:22px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 18px}
+.filters input{flex:1;min-width:180px}
+.empty{color:var(--muted);font:15px var(--sans)}
+code{font:13px ui-monospace,monospace;color:#f0d2c4}
+@media (max-width:640px){h1{font-size:30px}nav.main{margin-left:0;width:100%}}
