@@ -67,6 +67,6 @@ export function leaveWorkshop() {
 
 export function requireWorkshop() {
   const page = location.pathname.split("/").pop() || "index.html";
-  if (page === "login.html") return;
+  if (page === "login.html" || page === "azure.html") return;
   if (!signedIn()) location.replace("./login.html");
 }
