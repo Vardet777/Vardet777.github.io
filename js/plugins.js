@@ -5,6 +5,27 @@ export const PLUGIN_VERSION = "1.0.0";
 
 export const plugins = [
   {
+    id: "plugins.freePluginsHem",
+    re: /^(free[\s-]?plugins[\s-]?hem|fp hem|var är free[\s-]?plugins|free[\s-]?plugins sajt)\s*\??$/i,
+    run() {
+      return {
+        ok: true,
+        pluginText: [
+          "Free-Plugins hem (örst i katalogen och som pack):".replace("örst","först"),
+          "Sajt: inte publicerad. Ingen publik webbadress.",
+          "Lokalt: artifacts/free-plugins-site — öppna index.html efter inloggning.",
+          "Repo sajt: github.com/Vardet777/Free-Plugins-4-all",
+          "Repo Kent: github.com/Vardet777/Kent",
+          "KM2 är separat: github.com/Vardet777/KM2",
+          "Innehåll: Katalog (sök, Gratis/Betal, kategorier, texter, taggar) · Skapa (bild, film, musik, nedladdning) · Kent · Reklamplatser · Pack · villkor/integritet.",
+          "Inloggningsvägg på.",
+          "Packfil: packs/free-plugins-hem-v1.json",
+          "Jag hittar inte på en live-URL."
+        ].join("\n")
+      };
+    }
+  },
+  {
     id: "plugins.list",
     re: /^(plugins|tillägg|färdigheter|vad kan du)\s*\??$/i,
     run() {
@@ -12,6 +33,7 @@ export const plugins = [
         ok: true,
         pluginText:
           "Tillägg som faktiskt körs här:\n" +
+          "- Free-Plugins hem — sajt, innehåll, repo. Ingen publik adress.\n" +
           "- klarhet: … — tre punkter + en handling\n" +
           "- beslut: … — alternativ och ägarrisk\n" +
           "- plan: … — idag / veckan / inte nu\n" +
