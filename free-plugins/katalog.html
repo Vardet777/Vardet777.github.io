@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Free-Plugins — katalog</title>
 <link rel="stylesheet" href="./css/site.css"/>
+<link rel="stylesheet" href="./css/photos.css"/>
 </head>
 <body>
   <div class="wrap">
@@ -30,6 +31,7 @@
   <script type="module">
     import "./js/shell.js";
     import { loadCatalog, filterItems, cardHtml } from "./js/catalog.js";
+    import { addEvent } from "./js/memory.js";
     const list = document.getElementById("list");
     const q = document.getElementById("q");
     const mode = document.getElementById("mode");
@@ -40,6 +42,7 @@
       list.innerHTML = items.length ? items.map(cardHtml).join("") : `<p class="empty">Inget i katalogen för den sökningen.</p>`;
     }
     data = await loadCatalog();
+    addEvent({ agent: "katalog", kind: "open", text: `Katalog öppnad, ${data.items.length} poster` });
     draw();
     q.addEventListener("input", draw);
     mode.addEventListener("change", draw);

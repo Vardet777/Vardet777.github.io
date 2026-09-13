@@ -5,32 +5,53 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Free-Plugins — Linnea</title>
 <link rel="stylesheet" href="./css/site.css"/>
+<link rel="stylesheet" href="./css/photos.css"/>
 </head>
 <body>
   <div class="wrap">
     <header class="top" id="site-header"></header>
     <p class="kicker">Linnea</p>
-    <h1>Test och guide. Kent är ersatt.</h1>
-    <p class="lead">Kort. Produkt först. Säg vad som är ett upplägg. Exportera lärdomar — de är säljbar data till Vardet777.</p>
-    <div class="card">
-      <div class="log" id="log"></div>
-      <form class="stack" id="f" style="margin-top:12px">
-        <input id="t" placeholder="vad kan du · free-plugins hem · testa: Free-Plugins hem" autocomplete="off"/>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button type="submit">Skicka</button>
-          <button type="button" class="ghost" id="ex">Exportera lärdomar</button>
+    <h1>Röst, test och delat minne.</h1>
+    <div class="stage">
+      <img class="portrait" src="./img/linnea-lace.jpg" alt="Linnea" onerror="this.style.opacity=0"/>
+      <div class="card">
+        <div class="status">
+          <span><i class="dot" id="vdot"></i> röst</span>
+          <span><i class="dot" id="mdot"></i> minne</span>
+          <span id="src">källa: lokal</span>
         </div>
-      </form>
+        <div class="log" id="log"></div>
+        <form class="stack" id="f" style="margin-top:12px">
+          <input id="t" placeholder="vad kan du · kom ihåg: · testa: Free-Plugins hem" autocomplete="off"/>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button type="submit">Skicka</button>
+            <button type="button" class="ghost" id="talk">Prata</button>
+            <button type="button" class="ghost" id="mic">Lyssna</button>
+            <button type="button" class="ghost" id="voice">Röst på</button>
+          </div>
+        </form>
+        <p class="hint" style="margin-top:10px">Valfri xAI-nyckel stannar i den här webbläsaren. Tomt = bara lokal Linnea.</p>
+        <input id="xai" type="password" placeholder="xAI-nyckel (valfritt)" autocomplete="off"/>
+      </div>
     </div>
     <footer id="site-footer"></footer>
   </div>
   <script type="module">
     import "./js/shell.js";
     import { loadCatalog } from "./js/catalog.js";
-    import { replyTo, addLearning, exportLearnings } from "./js/linnea.js";
+    import { answer, getXaiKey, setXaiKey } from "./js/linnea.js";
+    import { loadBank } from "./js/memory.js";
+    import { speak, stopSpeak, listenOnce, voiceWanted, setVoiceWanted, canListen } from "./js/voice.js";
     const log = document.getElementById("log");
     const input = document.getElementById("t");
     const catalog = await loadCatalog();
+    const bank = loadBank();
+    document.getElementById("mdot").classList.toggle("on", bank.facts.length + bank.events.length > 0);
+    document.getElementById("vdot").classList.toggle("on", voiceWanted());
+    document.getElementById("voice").textContent = voiceWanted() ? "Röst på" : "Röst av";
+    document.getElementById("xai").value = getXaiKey();
+    document.getElementById("xai").addEventListener("change", (e) => setXaiKey(e.target.value));
+    if (!canListen()) document.getElementById("mic").disabled = true;
     function add(role, text) {
       const d = document.createElement("div");
       d.className = "msg " + role;
@@ -38,18 +59,44 @@
       log.appendChild(d);
       d.scrollIntoView({ block: "end" });
     }
-    add("linnea", "Hej. Jag är Linnea på den här sajten. Kent är ersatt. Sajten är inte publicerad.");
+    add("linnea", "Hej. Jag är Linnea. Kent är ersatt. Sajten är verkstad. Säg kom ihåg: för delat minne. Tryck Prata så läser jag högt.");
+    async function send(text) {
+      if (!text) return;
+      add("you", text);
+      const out = await answer(text, catalog);
+      add("linnea", out.text);
+      document.getElementById("src").textContent = "källa: " + out.source;
+      document.getElementById("mdot").classList.add("on");
+      speak(out.text);
+    }
     document.getElementById("f").addEventListener("submit", (e) => {
       e.preventDefault();
       const text = input.value.trim();
-      if (!text) return;
       input.value = "";
-      add("you", text);
-      const reply = replyTo(text, catalog);
-      add("linnea", reply);
-      addLearning({ query: text, reply, liveRan: false, plugins: [] });
+      send(text);
     });
-    document.getElementById("ex").addEventListener("click", exportLearnings);
+    document.getElementById("talk").addEventListener("click", () => {
+      const last = [...log.querySelectorAll(".msg.linnea")].pop();
+      if (last) speak(last.textContent);
+    });
+    document.getElementById("voice").addEventListener("click", () => {
+      const next = !voiceWanted();
+      setVoiceWanted(next);
+      document.getElementById("voice").textContent = next ? "Röst på" : "Röst av";
+      document.getElementById("vdot").classList.toggle("on", next);
+      if (!next) stopSpeak();
+    });
+    document.getElementById("mic").addEventListener("click", () => {
+      listenOnce({
+        onStart() { document.getElementById("mic").classList.add("live"); },
+        onResult(text) {
+          document.getElementById("mic").classList.remove("live");
+          input.value = text;
+          send(text);
+        },
+        onError() { document.getElementById("mic").classList.remove("live"); }
+      });
+    });
   </script>
 </body>
 </html>

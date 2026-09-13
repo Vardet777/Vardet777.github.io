@@ -21,7 +21,11 @@ export function cardHtml(it) {
   const price = it.gratis
     ? `<span class="badge gratis">Gratis</span>`
     : `<span class="badge betal">Betal</span>`;
+  const cover = it.cover
+    ? `<img class="cover" src="${it.cover}" alt="" onerror="this.style.display='none'"/>`
+    : "";
   return `<article class="card" data-id="${it.id}">
+    ${cover}
     <h3>${it.name}</h3>
     <p>${price}<span class="badge">${it.kind}</span>${tags}</p>
     <p>${it.text}</p>

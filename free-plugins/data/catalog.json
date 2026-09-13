@@ -4,7 +4,7 @@
   "loginWall": true,
   "agent": "Linnea",
   "replaced": "Kent",
-  "note": "Förhandsvisning under /free-plugins/. Inte publicerad som produkt.",
+  "note": "Ingen publik webbadress. Öppna artifacts/free-plugins-site/login.html. Påhittade tredjeposts ingår inte.",
   "items": [
     {
       "id": "free-plugins-hem-v1",
@@ -15,10 +15,13 @@
       "position": 1,
       "category": "hem",
       "tags": ["sajt", "repo", "pack", "linnea"],
-      "text": "Pekar ut sajten, innehållet och repot. Inte publicerad som produkt.",
+      "text": "Pekar ut sajten, innehållet och repot. Inte publicerad.",
+      "cover": "./img/skull-fire.jpg",
       "pack": "packs/free-plugins-hem-v1.json",
       "official": null,
       "publicUrl": null
     }
-  ]
+  ],
+  "ads": false,
+  "sharedMemory": "local+onedrive-export"
 }
