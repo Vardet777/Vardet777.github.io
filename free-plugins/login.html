@@ -5,15 +5,19 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Free-Plugins — inloggning</title>
 <link rel="stylesheet" href="./css/site.css"/>
+<link rel="stylesheet" href="./css/photos.css"/>
 </head>
 <body>
   <main class="gate">
-    <p class="kicker">Verkstad</p>
-    <h1>Inloggningsvägg</h1>
-    <p>Sajten är inte publicerad som produkt. Det här är en förhandsvisning. Öppna bara om du är ägaren.</p>
-    <p class="hint">Det här är ingen kontosäkerhet. Det är en vägg så sidan inte behandlas som live-produkt.</p>
-    <p style="margin-top:18px"><button type="button" id="enter">Öppna verkstad</button></p>
-    <p class="hint">Agent: Linnea. Kent är ersatt. Appen byggs efter sajten.</p>
+    <img src="./img/linnea-lace.jpg" alt="Linnea" onerror="this.style.opacity=0"/>
+    <div class="inner">
+      <p class="kicker">Verkstad</p>
+      <h1>Inloggningsvägg</h1>
+      <p>Sajten är inte publicerad som produkt. Öppna bara om du är ägaren.</p>
+      <p class="hint">Ingen kontosäkerhet. En vägg så sidan inte behandlas som live.</p>
+      <p style="margin-top:18px"><button type="button" id="enter">Öppna verkstad</button></p>
+      <p class="hint">Agent: Linnea. Kent är ersatt. Delat minne + röst inne.</p>
+    </div>
   </main>
   <script type="module">
     import { enterWorkshop, signedIn } from "./js/auth.js";
