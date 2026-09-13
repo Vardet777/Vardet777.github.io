@@ -97,36 +97,66 @@ function fillVoiceSelect() {
     sel.appendChild(o);
   }
 }
+
 let speechUnlocked = false;
+let lastReply = "";
+let speakTimer = 0;
+function resumeEngine() {
+  try { window.speechSynthesis?.resume(); } catch (e) {}
+}
+function chunkText(text) {
+  const raw = String(text || "").replace(/\s+/g, " ").trim();
+  if (raw.length <= 220) return raw ? [raw] : [];
+  const parts = [];
+  let buf = "";
+  for (const sentence of raw.split(/(?<=[.!?])\s+/)) {
+    if ((buf + " " + sentence).trim().length > 220 && buf) { parts.push(buf.trim()); buf = sentence; }
+    else buf = (buf + " " + sentence).trim();
+  }
+  if (buf) parts.push(buf);
+  return parts.slice(0, 8);
+}
+function makeUtterance(text) {
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "sv-SE";
+  u.rate = 0.98;
+  u.pitch = 1.03;
+  const v = pickVoice();
+  if (v) { u.voice = v; u.lang = v.lang || "sv-SE"; }
+  return u;
+}
 function unlockSpeech() {
-  if (speechUnlocked || !window.speechSynthesis) return;
+  if (!window.speechSynthesis) return;
+  resumeEngine();
+  window.speechSynthesis.getVoices();
   speechUnlocked = true;
+}
+function holdAudioSession() {
+  if (!settings.voiceOn || !window.speechSynthesis) return;
+  unlockSpeech();
+  resumeEngine();
   try {
-    window.speechSynthesis.cancel();
-    const warm = new SpeechSynthesisUtterance(" ");
-    warm.volume = 0;
-    warm.lang = "sv-SE";
-    const v = pickVoice();
-    if (v) warm.voice = v;
-    window.speechSynthesis.speak(warm);
-    window.speechSynthesis.cancel();
+    const hold = makeUtterance("Mm.");
+    hold.volume = 0.7;
+    window.speechSynthesis.speak(hold);
   } catch (e) {}
 }
 function speak(text) {
   if (!settings.voiceOn || !window.speechSynthesis) return;
-  const clipped = String(text || "").replace(/\s+/g, " ").trim().slice(0, 1400);
-  if (!clipped) return;
+  const chunks = chunkText(text);
+  if (!chunks.length) return;
+  lastReply = chunks.join(" ");
   unlockSpeech();
-  window.speechSynthesis.cancel();
-  setTimeout(() => {
-    const u = new SpeechSynthesisUtterance(clipped);
-    u.lang = "sv-SE";
-    u.rate = 0.96;
-    u.pitch = 1.04;
-    const v = pickVoice();
-    if (v) { u.voice = v; u.lang = v.lang || "sv-SE"; }
-    window.speechSynthesis.speak(u);
-  }, 60);
+  resumeEngine();
+  clearTimeout(speakTimer);
+  try { window.speechSynthesis.cancel(); } catch (e) {}
+  const queue = () => {
+    resumeEngine();
+    chunks.forEach((part) => window.speechSynthesis.speak(makeUtterance(part)));
+    if (window.speechSynthesis.paused) resumeEngine();
+  };
+  queue();
+  speakTimer = setTimeout(queue, 250);
 }
 
 function isStandalone() {
@@ -144,9 +174,11 @@ async function boot() {
   showInstallHint();
   if (!session.greetingSent) {
     const r = await handleTurn({ text: "", memory, session, settings, wantGreeting: true });
+    lastReply = r.reply;
     const v = pickVoice();
     add("linnea", r.reply, v ? "hälsning · " + v.name : "hälsning");
   } else if (session.turns.length) {
+    lastReply = session.turns.filter((t) => t.role !== "user").slice(-1)[0]?.content || "";
     for (const t of session.turns.slice(-16)) add(t.role === "user" ? "user" : "linnea", t.content, t.provider || "");
   }
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
@@ -158,17 +190,32 @@ async function send(text) {
   add("user", value);
   setStatus("skriver…");
   const r = await handleTurn({ text: value, memory, session, settings });
+  lastReply = r.reply;
   add("linnea", r.reply, r.providerLabel || r.provider);
   speak(r.reply);
   setStatus(statusLine(r.providerLabel || "lokal"));
 }
-form.addEventListener("submit", (e) => { e.preventDefault(); send(input.value); });
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  holdAudioSession();
+  send(input.value);
+});
+const speakBtn = document.getElementById("speak-last");
+if (speakBtn) {
+  speakBtn.addEventListener("click", () => {
+    unlockSpeech();
+    const text = lastReply || "";
+    if (!text) { setStatus("inget att läsa upp än — skriv först"); return; }
+    settings.voiceOn = true;
+    speak(text);
+    setStatus(statusLine("läser upp"));
+  });
+}
 micBtn.addEventListener("click", () => {
   const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!Rec) { add("linnea", "Använd tangentbordets mikrofon och tryck Skicka."); return; }
   if (listening) return;
-  unlockSpeech();
-  window.speechSynthesis?.cancel();
+  holdAudioSession();
   const rec = new Rec();
   rec.lang = "sv-SE";
   rec.interimResults = false;
