@@ -4,11 +4,11 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Free-Plugins — inloggning</title>
-<link rel="stylesheet" href="./css/site.css?v=18"/>
-<link rel="stylesheet" href="./css/photos-a.css?v=18"/>
-<link rel="stylesheet" href="./css/photos-b.css?v=18"/>
-<link rel="stylesheet" href="./css/photos-c.css?v=18"/>
-<link rel="stylesheet" href="./css/photos.css?v=18"/>
+<link rel="stylesheet" href="./css/site.css?v=19"/>
+<link rel="stylesheet" href="./css/photos-a.css?v=19"/>
+<link rel="stylesheet" href="./css/photos-b.css?v=19"/>
+<link rel="stylesheet" href="./css/photos-c.css?v=19"/>
+<link rel="stylesheet" href="./css/photos.css?v=19"/>
 </head>
 <body>
   <main class="gate">
@@ -36,7 +36,6 @@
   <script type="module">
     import { signedIn, hasPassword, setPassword, unlock, passwordRules } from "./js/auth.js";
     if (signedIn() && hasPassword()) location.replace("./index.html");
-
     const setup = !hasPassword();
     document.getElementById("title").textContent = setup ? "Välj lösenord" : "Lösenord";
     document.getElementById("lead").textContent = setup
@@ -46,7 +45,6 @@
     document.getElementById("pass-label").firstChild.textContent = setup ? "Nytt lösenord" : "Lösenord";
     document.getElementById("pass").autocomplete = setup ? "new-password" : "current-password";
     document.getElementById("go").textContent = setup ? "Spara och öppna" : "Öppna verkstad";
-
     const err = document.getElementById("err");
     document.getElementById("form").addEventListener("submit", async (e) => {
       e.preventDefault();
