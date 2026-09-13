@@ -1,0 +1,44 @@
+{
+  "id": "husmanskost-v1",
+  "name": "Husmanskost",
+  "version": "0.1.0",
+  "kind": "cookbook",
+  "license": "AllRightsReserved",
+  "language": "sv",
+  "status": "draft",
+  "attribution": "Originaltexter, Vardet777",
+  "source": "original",
+  "owner": "Vardet777",
+  "items": [
+    {
+      "id": "ugnsstekt-rotfruktsgryta",
+      "title": "Ugnsstekt rotfruktsgryta",
+      "servings": 4,
+      "timeMinutes": 55,
+      "difficulty": "lätt",
+      "tags": ["vegetarisk"],
+      "ingredients": [{"amount": "4 st", "name": "morötter"}, {"amount": "1 st", "name": "lök"}],
+      "steps": ["Sätt ugnen på 200 grader.", "Skär och blanda.", "Grädda 40 minuter."]
+    },
+    {
+      "id": "panna-med-agg-och-potatis",
+      "title": "Panna med ägg och potatis",
+      "servings": 2,
+      "timeMinutes": 25,
+      "difficulty": "lätt",
+      "tags": ["snabb"],
+      "ingredients": [{"amount": "4 st", "name": "kokta potatisar"}, {"amount": "2 st", "name": "ägg"}],
+      "steps": ["Stek potatisen.", "Knäck i äggen.", "Krydda."]
+    },
+    {
+      "id": "havregryngrot-med-bar",
+      "title": "Havregrynsgröt med bär",
+      "servings": 1,
+      "timeMinutes": 10,
+      "difficulty": "lätt",
+      "tags": ["frukost"],
+      "ingredients": [{"amount": "1 dl", "name": "havregryn"}, {"amount": "2 dl", "name": "vätska"}],
+      "steps": ["Koka grynen.", "Vila.", "Lägg på bär."]
+    }
+  ]
+}

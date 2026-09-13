@@ -1,0 +1,14 @@
+{
+  "id": "pack-passport-v1",
+  "name": "Pack-passport",
+  "version": "0.1.0",
+  "kind": "passport",
+  "license": "AllRightsReserved",
+  "language": "sv",
+  "status": "owner-locked",
+  "attribution": "Originaltexter, Vardet777",
+  "source": "original",
+  "owner": "Vardet777",
+  "does": "Beskriver hur ett pack ser ut i v1.",
+  "innehall": ["id name version kind license language status source", "ingen scraped källa", "ingen körbar tredjepartskod"]
+}
