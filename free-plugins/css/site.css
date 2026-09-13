@@ -46,6 +46,8 @@ p.lead{font-size:19px;color:#eadfd7;max-width:40rem}
 .hero .veil{position:absolute;inset:0;background:linear-gradient(180deg,transparent 42%,#070505d8 96%);pointer-events:none}
 .hero .copy{position:absolute;left:24px;right:24px;bottom:22px}
 .hero .copy h1{font-size:46px;margin:0 0 8px;color:#ffd7c4;text-shadow:0 8px 28px #000}
+.duo{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin:18px 0}
+.duo img{width:100%;height:100%;min-height:280px;object-fit:cover;border-radius:18px;border:1px solid var(--line)}
 form.stack,fieldset{display:flex;flex-direction:column;gap:8px;border:0;padding:0;margin:0}
 label{font:12px var(--sans);color:var(--muted)}
 input,select,textarea,button{font:16px var(--sans);border-radius:12px;border:1px solid var(--line);background:#120c0b;color:var(--ink);padding:10px 12px}
@@ -58,22 +60,41 @@ button.live{box-shadow:0 0 0 2px #e07a4a55}
 .msg.linnea{align-self:flex-start;background:#241614}
 .msg.you{align-self:flex-end;background:#3a1b16}
 .stage{display:grid;grid-template-columns:200px 1fr;gap:16px;align-items:start}
-.portrait{width:100%;border-radius:18px;border:1px solid var(--line);height:320px;min-height:320px;display:block}
+.stage img.portrait,.portrait{
+  width:100%;border-radius:18px;border:1px solid var(--line);
+  object-fit:cover;height:320px;min-height:320px;object-position:center 12%;
+  display:block;
+}
 .status{font:12px var(--sans);color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .dot{width:8px;height:8px;border-radius:50%;background:#6a4038;display:inline-block}
 .dot.on{background:#c4e0b8;box-shadow:0 0 8px #c4e0b8}
 footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font:12px var(--sans);color:var(--muted)}
 footer button{margin-left:8px;padding:4px 10px}
 .gate{max-width:460px;margin:8vh auto;padding:0;background:var(--paper);border:1px solid var(--line);border-radius:24px;overflow:hidden;box-shadow:0 24px 60px #0008}
-.gate-photo{width:100%;height:300px;min-height:300px;display:block}
+.gate img,.gate-photo{width:100%;height:300px;min-height:300px;object-fit:cover;object-position:center 16%;display:block}
 .gate .inner{padding:22px 24px 26px}
 .filters{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 18px}
 .filters input{flex:1;min-width:180px}
 .empty{color:var(--muted);font:15px var(--sans)}
+.facts{font:14px var(--sans);color:#eadfd7}
+.facts li{margin:0 0 8px}
+.talk-dock{
+  position:sticky;
+  bottom:0;
+  z-index:40;
+  display:flex;
+  gap:8px;
+  padding:10px 0 calc(12px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,transparent,#070505 28%);
+}
+.talk-dock button{flex:1;min-height:48px}
+.talk-dock #talk{background:var(--ember);color:#1a0c08;border:0}
 @media (max-width:800px){
   h1{font-size:32px}
-  .hero-photo{height:300px;min-height:300px}
+  .hero img,.hero-photo{height:300px;min-height:300px}
   .hero .copy h1{font-size:32px}
-  .stage{grid-template-columns:1fr}
+  .duo,.stage{grid-template-columns:1fr}
   nav.main{margin-left:0;width:100%}
+  .stage .portrait{height:120px;min-height:120px}
+  .log{min-height:140px;max-height:36vh}
 }
