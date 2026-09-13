@@ -1,0 +1,50 @@
+{
+  "id": "free-plugins-hem-v1",
+  "name": "Free-Plugins hem",
+  "version": "1.1.0",
+  "kind": "passport",
+  "license": "AllRightsReserved",
+  "language": "sv",
+  "status": "owner-locked",
+  "attribution": "Originaltexter, Vardet777",
+  "source": "original",
+  "owner": "Vardet777",
+  "catalogPosition": 1,
+  "does": "Pekar ut var sajten ligger, vad den innehåller och vilket repo som gäller.",
+  "var": {
+    "publicerad": false,
+    "publikWebbadress": null,
+    "inloggning": true,
+    "lokalMapp": "artifacts/free-plugins-site",
+    "startfil": "login.html",
+    "efterInloggning": "index.html",
+    "preview": "https://vardet777.github.io/free-plugins/login.html",
+    "repoSajt": "https://github.com/Vardet777/Free-Plugins-4-all",
+    "repoKent": "https://github.com/Vardet777/Kent",
+    "repoKM2": "https://github.com/Vardet777/KM2",
+    "agent": "Linnea",
+    "kentErsatt": true
+  },
+  "innehall": [
+    "Katalog: sök, Gratis/Betal, kategorier, texter, taggar",
+    "Skapa: bild, film, musik, nedladdning",
+    "Linnea (Kent ersatt)",
+    "Reklamplatser",
+    "Pack",
+    "villkor/integritet"
+  ],
+  "sidor": [
+    "login.html",
+    "index.html",
+    "katalog.html",
+    "skapa.html",
+    "linnea.html",
+    "kent.html",
+    "reklam.html",
+    "pack.html",
+    "om.html",
+    "villkor.html",
+    "integritet.html"
+  ],
+  "packfil": "packs/free-plugins-hem-v1.json"
+}

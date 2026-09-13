@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Free-Plugins — skapa</title>
+<link rel="stylesheet" href="./css/site.css"/>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top" id="site-header"></header>
+    <p class="kicker">Skapa</p>
+    <h1>Bild, film, musik. Du laddar ner. Rätten stannar.</h1>
+    <p class="lead">Molngenerering är inte inkopplad här. Du får ett verk-kvitto att ladda ner. Live-fil kommer när ägaren kopplar en modell.</p>
+    <form class="stack" id="make">
+      <label>Typ</label>
+      <select id="kind">
+        <option value="bild">Bild</option>
+        <option value="film">Film</option>
+        <option value="musik">Musik</option>
+      </select>
+      <label>Namn</label>
+      <input id="name" required placeholder="arbetsnamn"/>
+      <label>Prompt</label>
+      <textarea id="prompt" required placeholder="Vad ska göras"></textarea>
+      <button type="submit">Spara verk och ladda ner</button>
+    </form>
+    <p class="hint">Upphovsrätt Vardet777 tills annat avtalats. Inte ett påstående att filmen redan är renderad.</p>
+    <footer id="site-footer"></footer>
+  </div>
+  <script type="module">
+    import "./js/shell.js";
+    import { addLearning } from "./js/linnea.js";
+    document.getElementById("make").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const work = {
+        type: "work",
+        kind: document.getElementById("kind").value,
+        name: document.getElementById("name").value.trim(),
+        prompt: document.getElementById("prompt").value.trim(),
+        rights: "Vardet777",
+        asset: "sellable",
+        rendered: false
+      };
+      addLearning(work);
+      const blob = new Blob([JSON.stringify(work, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = (work.name || "verk") + ".json";
+      a.click();
+    });
+  </script>
+</body>
+</html>

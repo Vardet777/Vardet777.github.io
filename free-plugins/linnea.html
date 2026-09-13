@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Free-Plugins — Linnea</title>
+<link rel="stylesheet" href="./css/site.css"/>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top" id="site-header"></header>
+    <p class="kicker">Linnea</p>
+    <h1>Test och guide. Kent är ersatt.</h1>
+    <p class="lead">Kort. Produkt först. Säg vad som är ett upplägg. Exportera lärdomar — de är säljbar data till Vardet777.</p>
+    <div class="card">
+      <div class="log" id="log"></div>
+      <form class="stack" id="f" style="margin-top:12px">
+        <input id="t" placeholder="vad kan du · free-plugins hem · testa: Free-Plugins hem" autocomplete="off"/>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="submit">Skicka</button>
+          <button type="button" class="ghost" id="ex">Exportera lärdomar</button>
+        </div>
+      </form>
+    </div>
+    <footer id="site-footer"></footer>
+  </div>
+  <script type="module">
+    import "./js/shell.js";
+    import { loadCatalog } from "./js/catalog.js";
+    import { replyTo, addLearning, exportLearnings } from "./js/linnea.js";
+    const log = document.getElementById("log");
+    const input = document.getElementById("t");
+    const catalog = await loadCatalog();
+    function add(role, text) {
+      const d = document.createElement("div");
+      d.className = "msg " + role;
+      d.textContent = text;
+      log.appendChild(d);
+      d.scrollIntoView({ block: "end" });
+    }
+    add("linnea", "Hej. Jag är Linnea på den här sajten. Kent är ersatt. Sajten är inte publicerad.");
+    document.getElementById("f").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = "";
+      add("you", text);
+      const reply = replyTo(text, catalog);
+      add("linnea", reply);
+      addLearning({ query: text, reply, liveRan: false, plugins: [] });
+    });
+    document.getElementById("ex").addEventListener("click", exportLearnings);
+  </script>
+</body>
+</html>

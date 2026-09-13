@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Free-Plugins — katalog</title>
+<link rel="stylesheet" href="./css/site.css"/>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top" id="site-header"></header>
+    <p class="kicker">Katalog</p>
+    <h1>Ett ägar-pack först. Inget påhittat lager.</h1>
+    <div class="filters">
+      <input id="q" type="search" placeholder="Sök namn, text, tagg"/>
+      <select id="mode">
+        <option value="alla">Alla</option>
+        <option value="gratis">Gratis</option>
+        <option value="betal">Betal</option>
+      </select>
+      <select id="cat">
+        <option value="">Kategorier</option>
+        <option value="hem">hem</option>
+      </select>
+    </div>
+    <div id="list" class="grid"></div>
+    <p class="hint">Gratis = det finns en gratisversion. Officiella tredjeposts läggs in när ägaren ger källa, inte före.</p>
+    <footer id="site-footer"></footer>
+  </div>
+  <script type="module">
+    import "./js/shell.js";
+    import { loadCatalog, filterItems, cardHtml } from "./js/catalog.js";
+    const list = document.getElementById("list");
+    const q = document.getElementById("q");
+    const mode = document.getElementById("mode");
+    const cat = document.getElementById("cat");
+    let data = { items: [] };
+    function draw() {
+      const items = filterItems(data.items, { q: q.value, mode: mode.value, category: cat.value });
+      list.innerHTML = items.length ? items.map(cardHtml).join("") : `<p class="empty">Inget i katalogen för den sökningen.</p>`;
+    }
+    data = await loadCatalog();
+    draw();
+    q.addEventListener("input", draw);
+    mode.addEventListener("change", draw);
+    cat.addEventListener("change", draw);
+  </script>
+</body>
+</html>
