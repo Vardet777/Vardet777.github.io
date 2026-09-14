@@ -26,3 +26,16 @@ test("Memory keeps local cache as the actual backend until Drive is really bound
   assert.match(source, /Google Drive blir canonical extern backend först efter faktisk bindning/);
   assert.match(source, /OneDrive är inte backend för delat AI-minne/);
 });
+
+test("Linnea and Kent are separate first-class agents", () => {
+  const shell = read("js/shell.js");
+  const kent = read("kent.html");
+  const memory = read("js/memory.js");
+  assert.match(shell, /\[\"linnea\.html\",\s*\"Linnea\"\]/);
+  assert.match(shell, /\[\"kent\.html\",\s*\"Kent\"\]/);
+  assert.doesNotMatch(kent, /meta http-equiv=\"refresh\"/i);
+  assert.match(kent, /Kent/);
+  assert.match(kent, /js\/kent\.js/);
+  assert.match(memory, /\"linnea\"/);
+  assert.match(memory, /\"kent\"/);
+});
