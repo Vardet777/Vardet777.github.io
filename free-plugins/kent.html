@@ -19,11 +19,11 @@
       <div class="card">
         <div class="status">
           <span><i class="dot on"></i> agent</span>
-          <span><i class="dot" id="mdot"></i> delat minne</span>
+          <span><i class="dot" id="mdot"></i> eget minne</span>
           <span id="src">lokal service</span>
         </div>
         <div class="log" id="log">
-          <div class="msg linnea">Hej. Jag är Kent. Jag är en separat agent från Linnea, men kan använda samma delade minneskontext.</div>
+          <div class="msg linnea">Hej. Jag är Kent. Jag är en separat agent från Linnea och har en egen minnesgrund.</div>
         </div>
         <form class="stack" id="f" style="margin-top:12px">
           <input id="t" placeholder="skriv till Kent" autocomplete="off"/>
@@ -39,7 +39,7 @@
           <button type="submit" form="f">Skicka</button>
           <button type="button" class="ghost" id="mic">Lyssna</button>
         </div>
-        <p class="hint" id="hint">Kent är en egen agent. Samma delade minne, separat identitet.</p>
+        <p class="hint" id="hint">Kent är en egen agent med egen minnesgrund. Linneas privata minne läses inte.</p>
       </div>
     </div>
     <footer id="site-footer"></footer>
@@ -102,7 +102,7 @@
   <script type="module">
     import "./js/shell.js?v=26";
     import { answer } from "./js/kent.js?v=26";
-    import { loadBank } from "./js/memory.js?v=26";
+    import { loadAgentBank } from "./js/memory.js?v=26";
     window.__kentAnswer = async function (text) {
       try {
         const out = await answer(text);
@@ -115,7 +115,7 @@
       }
     };
     try {
-      const bank = loadBank();
+      const bank = loadAgentBank("kent");
       document.getElementById("mdot").classList.toggle("on", bank.facts.length + bank.events.length > 0);
     } catch (e) {}
   </script>
