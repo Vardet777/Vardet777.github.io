@@ -8,7 +8,7 @@ const PAGES = [
 requireWorkshop();
 const here = location.pathname.split("/").pop() || "index.html";
 const nav = PAGES.map(([href, label]) => {
-  const on = here === href || (here === "kent.html" && href === "linnea.html") ? " on" : "";
+  const on = here === href ? " on" : "";
   return `<a class="${on.trim()}" href="./${href}">${label}</a>`;
 }).join("");
 const header = document.getElementById("site-header");
