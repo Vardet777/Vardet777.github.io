@@ -1,12 +1,12 @@
 {
-  "version": "1.1.0",
+  "version": "1.1.1",
   "published": false,
   "loginWall": true,
   "agent": "Linnea",
   "replaced": "Kent",
-  "note": "Verkstad. Inga påhittade tredjeposts.",
+  "note": "Verkstad. Inga påhittade tredjepartsposter.",
   "ads": false,
-  "sharedMemory": "local+onedrive-export",
+  "sharedMemory": "local+google-drive-pending",
   "items": [
     {
       "id": "free-plugins-hem-v1",
@@ -58,8 +58,8 @@
       "betal": false,
       "position": 4,
       "category": "koppling",
-      "tags": ["azure", "onedrive", "graph", "plugin"],
-      "text": "Koppla ägarens Azure-app. Client-id lokalt. Ingen secret.",
+      "tags": ["azure", "onedrive", "graph", "legacy"],
+      "text": "Legacy Microsoft-koppling. Inte aktiv backend för Linneas delade minne.",
       "pack": "packs/azure-onedrive-v1.json",
       "official": "https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/CreateApplicationBlade",
       "publicUrl": "https://vardet777.github.io/free-plugins/azure.html"
