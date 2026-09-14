@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Free-Plugins — delat minne</title>
+<title>Free-Plugins — minne</title>
 <link rel="stylesheet" href="./css/site.css?v=25"/>
 <link rel="stylesheet" href="./css/photos-a.css?v=25"/>
 <link rel="stylesheet" href="./css/photos.css?v=25"/>
@@ -11,34 +11,40 @@
 <body>
   <div class="wrap">
     <header class="top" id="site-header"></header>
-    <p class="kicker">Delat minne</p>
-    <h1>Gemensamt AI-minne i Google Drive.</h1>
-    <p class="lead">En fil för alla AI: <code>gemensamt-ai-minne.json</code> i mappen <code>Gemensamt-AI-minne</code> på <strong>lundgrennisse@gmail.com</strong>. Drive-länkar kommer när det kontot äger filen.</p>
+    <p class="kicker">Minne</p>
+    <h1>Separata minnesgrunder.</h1>
+    <p class="lead">Linnea och Kent har varsin lokal minnesgrund. De läser inte varandras privata fakta eller chatthistorik. Verkstaden kan fortfarande exportera en gemensam backupfil som innehåller båda minnesgrunderna.</p>
     <p class="status" id="stat"></p>
-    <p class="hint">Telefonen sparar minnet i webbläsaren. Ladda ner JSON här. Drive skapas först när kopplingen är lundgrennisse@gmail.com.</p>
+    <p class="hint">Telefonen sparar minnet lokalt i webbläsaren. Google Drive är fortfarande pausat tills faktisk bindning och verifierad synk är klar.</p>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 20px">
-      <button type="button" id="exp">Ladda ner lokal kopia</button>
+      <button type="button" id="exp">Ladda ner minnesbackup</button>
       <label class="ghost" style="padding:10px 12px;border:1px solid var(--line);border-radius:12px;cursor:pointer">Importera JSON<input id="imp" type="file" accept="application/json,.json" hidden/></label>
     </div>
-    <h2>Fakta</h2><ul class="facts" id="facts"></ul>
-    <h2>Senaste händelser</h2><ul class="facts" id="events"></ul>
-    <h2>Verk</h2><ul class="facts" id="works"></ul>
+    <h2>Linnea</h2><ul class="facts" id="linnea"></ul>
+    <h2>Kent</h2><ul class="facts" id="kent"></ul>
+    <h2>Verkstadens övriga minne</h2><ul class="facts" id="shared"></ul>
     <footer id="site-footer"></footer>
   </div>
   <script type="module">
     import "./js/shell.js";
-    import { loadBank, exportBank, importFile, DRIVE_FILE } from "./js/memory.js";
+    import { loadBank, loadAgentBank, exportBank, importFile, DRIVE_FILE } from "./js/memory.js";
+    function rows(bank) {
+      const facts = bank.facts.slice().reverse().slice(0, 12).map((f) => `<li>${f.text} <span class="hint">${f.agent} · ${f.at}</span></li>`).join("") || "<li>Tomt.</li>";
+      const events = bank.events.slice().reverse().slice(0, 8).map((e) => `<li>${e.agent} / ${e.kind}: ${e.text}</li>`).join("");
+      return facts + (events ? `<li class="hint">${events}</li>` : "");
+    }
     function draw() {
-      const bank = loadBank();
+      const shared = loadBank();
+      const linnea = loadAgentBank("linnea");
+      const kent = loadAgentBank("kent");
       document.getElementById("stat").innerHTML =
-        `<span><i class="dot on"></i> ${bank.facts.length} fakta</span>` +
-        `<span>${bank.events.length} händelser</span>` +
-        `<span>${bank.works.length} verk</span>` +
-        `<span>Drive: ${bank.drive?.status || "pending-owner-drive"} → ${DRIVE_FILE}</span>`;
-      const li = (rows, map) => rows.slice().reverse().slice(0, 20).map(map).join("") || "<li>Tomt.</li>";
-      document.getElementById("facts").innerHTML = li(bank.facts, (f) => `<li>${f.text} <span class="hint">${f.agent} · ${f.at}</span></li>`);
-      document.getElementById("events").innerHTML = li(bank.events, (e) => `<li>${e.agent} / ${e.kind}: ${e.text}</li>`);
-      document.getElementById("works").innerHTML = li(bank.works, (w) => `<li>${w.kind || "verk"} · ${w.name || ""}</li>`);
+        `<span><i class="dot on"></i> Linnea: ${linnea.facts.length} fakta</span>` +
+        `<span>Kent: ${kent.facts.length} fakta</span>` +
+        `<span>Övrigt: ${shared.facts.length} fakta</span>` +
+        `<span>Backup: ${DRIVE_FILE}</span>`;
+      document.getElementById("linnea").innerHTML = rows(linnea);
+      document.getElementById("kent").innerHTML = rows(kent);
+      document.getElementById("shared").innerHTML = rows(shared);
     }
     draw();
     document.getElementById("exp").addEventListener("click", () => { exportBank(); draw(); });
