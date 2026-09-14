@@ -66,19 +66,23 @@ test("Private-memory UI stays explicit and points to the correct agent store", (
   assert.match(shell, /Linnea · Kent · separata minnen · verkstad/);
 });
 
-test("Legacy migration preserves both Linnea and Kent before shared cleanup", () => {
-  const source = read("js/memory.js");
-  assert.match(source, /function migrateLegacyAgents\(\)/);
-  assert.match(source, /migrateLegacyAgents\(\)/);
-  assert.match(source, /for \(const agent of ISOLATED_AGENTS\)/);
-  assert.match(source, /legacy\.facts\.filter\(\(row\) => \(row\.agent \|\| \"linnea\"\) === agent\)/);
-  assert.match(source, /legacy\.events\.filter\(\(row\) => \(row\.agent \|\| \"linnea\"\) === agent\)/);
-  assert.match(source, /stripIsolatedFromShared\(legacy\)/);
-});
-
 test("Kent must not describe Linnea's private memory as shared", () => {
   const source = read("js/kent.js");
   assert.match(source, /Kents egen minneskontext/);
   assert.match(source, /olika privata minnesgrunder/);
   assert.doesNotMatch(source, /samma delade minneskontext/);
+});
+
+test("Legacy migration waits to strip shared private rows until both agents are initialized", () => {
+  const source = read("js/memory.js");
+  assert.match(source, /fp\.private-memory-migration-v1/);
+  assert.match(source, /ISOLATED_AGENTS\.every\(\(agent\) => localStorage\.getItem\(\x60\$\{AGENT_MEMORY_KEYS\[agent\]\}\.initialized\x60\) === \"1\"\)/);
+  assert.match(source, /if \(!allInitialized\) return;/);
+});
+
+test("Import/export preserves separate private agent bundles", () => {
+  const source = read("js/memory.js");
+  assert.match(source, /agents: Object\.fromEntries\(ISOLATED_AGENTS\.map/);
+  assert.match(source, /for \(const agent of ISOLATED_AGENTS\)/);
+  assert.match(source, /persistAgent\(agent, bundle\.agents\?\[agent\]\)/);
 });
