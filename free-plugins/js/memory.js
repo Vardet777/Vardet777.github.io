@@ -1,5 +1,11 @@
 const KEY = "fp.shared.memory";
+const AGENT_MEMORY_KEYS = {
+  linnea: "fp.memory.linnea",
+  kent: "fp.memory.kent"
+};
 export const AGENTS = ["linnea", "kent", "katalog", "skapa", "pack"];
+export const ISOLATED_AGENTS = ["linnea", "kent"];
+export { AGENT_MEMORY_KEYS };
 export const DRIVE_FOLDER = "Gemensamt-AI-minne";
 export const DRIVE_OWNER_EMAIL = "lundgrennisse@gmail.com";
 export const DRIVE_FOLDER_ID = "";
@@ -12,7 +18,7 @@ function now() { return new Date().toISOString(); }
 
 function emptyBank() {
   return {
-    version: 2,
+    version: 3,
     owner: "Vardet777",
     updatedAt: null,
     backend: "local-export",
@@ -35,50 +41,98 @@ function emptyBank() {
   };
 }
 
+function normalizeBank(bank) {
+  const next = { ...emptyBank(), ...(bank || {}) };
+  next.facts = Array.isArray(next.facts) ? next.facts : [];
+  next.events = Array.isArray(next.events) ? next.events : [];
+  next.works = Array.isArray(next.works) ? next.works : [];
+  next.drive = { ...emptyBank().drive, ...(next.drive || {}) };
+  next.onedrive = { ...emptyBank().onedrive, ...(next.onedrive || {}) };
+  next.backend = "local-export";
+  next.drive.status = next.drive.bound ? "bound" : "pending-owner-drive";
+  next.onedrive.status = "not-backend";
+  return next;
+}
+
 export function loadBank() {
   try {
     const raw = localStorage.getItem(KEY);
-    if (!raw) return emptyBank();
-    const bank = { ...emptyBank(), ...JSON.parse(raw) };
-    bank.facts = Array.isArray(bank.facts) ? bank.facts : [];
-    bank.events = Array.isArray(bank.events) ? bank.events : [];
-    bank.works = Array.isArray(bank.works) ? bank.works : [];
-    bank.drive = { ...emptyBank().drive, ...(bank.drive || {}) };
-    bank.onedrive = { ...emptyBank().onedrive, ...(bank.onedrive || {}) };
-    bank.backend = "local-export";
-    bank.drive.status = bank.drive.bound ? "bound" : "pending-owner-drive";
-    bank.onedrive.status = "not-backend";
-    return bank;
+    return normalizeBank(raw ? JSON.parse(raw) : null);
   } catch {
     return emptyBank();
   }
 }
 
 function persist(bank) {
-  const next = { ...emptyBank(), ...bank, updatedAt: now() };
-  next.facts = (next.facts || []).slice(-400);
-  next.events = (next.events || []).slice(-500);
-  next.works = (next.works || []).slice(-200);
+  const next = normalizeBank({ ...bank, updatedAt: now() });
+  next.facts = next.facts.slice(-400);
+  next.events = next.events.slice(-500);
+  next.works = next.works.slice(-200);
   localStorage.setItem(KEY, JSON.stringify(next));
   return next;
 }
 
 export function saveBank(bank) { return persist(bank); }
 
+function migrateLegacyAgent(agent) {
+  const key = AGENT_MEMORY_KEYS[agent];
+  if (!key) return emptyBank();
+  const marker = `${key}.initialized`;
+  try {
+    if (localStorage.getItem(marker) === "1") return normalizeBank(JSON.parse(localStorage.getItem(key) || "{}"));
+    const legacy = loadBank();
+    const migrated = normalizeBank({
+      ...legacy,
+      facts: legacy.facts.filter((row) => (row.agent || "linnea") === agent),
+      events: legacy.events.filter((row) => (row.agent || "linnea") === agent),
+      works: legacy.works.filter((row) => (row.agent || "skapa") === agent)
+    });
+    localStorage.setItem(key, JSON.stringify(migrated));
+    localStorage.setItem(marker, "1");
+    return migrated;
+  } catch {
+    return emptyBank();
+  }
+}
+
+export function loadAgentBank(agent) {
+  const name = String(agent || "").toLowerCase();
+  if (!AGENT_MEMORY_KEYS[name]) return loadBank();
+  try {
+    const key = AGENT_MEMORY_KEYS[name];
+    if (!localStorage.getItem(`${key}.initialized`)) return migrateLegacyAgent(name);
+    return normalizeBank(JSON.parse(localStorage.getItem(key) || "{}"));
+  } catch {
+    return emptyBank();
+  }
+}
+
+function persistAgent(agent, bank) {
+  const key = AGENT_MEMORY_KEYS[agent];
+  if (!key) return persist(bank);
+  const next = normalizeBank({ ...bank, updatedAt: now() });
+  next.facts = next.facts.slice(-400);
+  next.events = next.events.slice(-500);
+  next.works = next.works.slice(-200);
+  localStorage.setItem(key, JSON.stringify(next));
+  localStorage.setItem(`${key}.initialized`, "1");
+  return next;
+}
+
 export function addEvent({ agent = "linnea", kind = "note", text = "", data = null } = {}) {
-  const bank = loadBank();
+  const bank = ISOLATED_AGENTS.includes(agent) ? loadAgentBank(agent) : loadBank();
   bank.events.push({ id: crypto.randomUUID(), at: now(), agent, kind, text: String(text || "").slice(0, 4000), data });
-  return saveBank(bank);
+  return ISOLATED_AGENTS.includes(agent) ? persistAgent(agent, bank) : saveBank(bank);
 }
 
 export function addFact({ agent = "linnea", text = "", tags = [] } = {}) {
   const clean = String(text || "").trim();
-  if (!clean) return loadBank();
-  const bank = loadBank();
+  if (!clean) return ISOLATED_AGENTS.includes(agent) ? loadAgentBank(agent) : loadBank();
+  const bank = ISOLATED_AGENTS.includes(agent) ? loadAgentBank(agent) : loadBank();
   if (!bank.facts.some((f) => f.text.toLowerCase() === clean.toLowerCase())) {
     bank.facts.push({ id: crypto.randomUUID(), at: now(), agent, text: clean.slice(0, 500), tags });
   }
-  return saveBank(bank);
+  return ISOLATED_AGENTS.includes(agent) ? persistAgent(agent, bank) : saveBank(bank);
 }
 
 export function addWork(work) {
@@ -94,7 +148,7 @@ export function rememberChat({ query, reply, agent = "linnea" }) {
 }
 
 export function contextForAgent(agent) {
-  const bank = loadBank();
+  const bank = ISOLATED_AGENTS.includes(agent) ? loadAgentBank(agent) : loadBank();
   return {
     agent,
     owner: bank.owner,
@@ -103,6 +157,7 @@ export function contextForAgent(agent) {
     workCount: bank.works.length,
     onedrive: bank.onedrive,
     drive: bank.drive,
+    isolatedMemory: ISOLATED_AGENTS.includes(agent),
     facts: bank.facts.slice(-20).map((f) => "- " + f.text).join("\n"),
     recent: bank.events.slice(-8).map((e) => e.agent + ":" + e.kind + " " + e.text).join("\n")
   };
@@ -112,32 +167,60 @@ export function canBindFolder() { return false; }
 export async function bindOneDriveFolder() { throw new Error("OneDrive är inte backend för delat AI-minne."); }
 export async function syncBoundFolder() { return { ok: false, status: "pending-owner-drive" }; }
 
+function mergeRows(current, incoming) {
+  const map = new Map();
+  for (const row of current || []) if (row?.id) map.set(row.id, row);
+  for (const row of incoming || []) if (row?.id) map.set(row.id, row);
+  return [...map.values()];
+}
+
 export function mergeBank(incoming) {
-  const cur = loadBank();
   const src = incoming && typeof incoming === "object" ? incoming : {};
-  const byId = (rows) => { const map = new Map(); for (const row of rows || []) if (row && row.id) map.set(row.id, row); return map; };
-  const facts = byId(cur.facts); for (const row of src.facts || []) if (row?.id) facts.set(row.id, row);
-  const events = byId(cur.events); for (const row of src.events || []) if (row?.id) events.set(row.id, row);
-  const works = byId(cur.works); for (const row of src.works || []) if (row?.id) works.set(row.id, row);
-  return persist({ ...cur, ...src, facts: [...facts.values()], events: [...events.values()], works: [...works.values()], drive: { ...cur.drive, ...(src.drive || {}), bound: false, status: "pending-owner-drive" }, onedrive: { ...cur.onedrive, status: "not-backend", bound: false }, backend: "local-export" });
+  if (src.agents && typeof src.agents === "object") {
+    for (const agent of ISOLATED_AGENTS) {
+      if (src.agents[agent]) persistAgent(agent, src.agents[agent]);
+    }
+  }
+  const cur = loadBank();
+  return persist({
+    ...cur,
+    ...src.shared,
+    facts: mergeRows(cur.facts, src.shared?.facts || src.facts),
+    events: mergeRows(cur.events, src.shared?.events || src.events),
+    works: mergeRows(cur.works, src.shared?.works || src.works),
+    drive: { ...cur.drive, ...(src.shared?.drive || src.drive || {}), bound: false, status: "pending-owner-drive" },
+    onedrive: { ...cur.onedrive, status: "not-backend", bound: false },
+    backend: "local-export"
+  });
 }
 
 export function exportBank() {
-  const bank = loadBank();
-  bank.drive = { ...bank.drive, lastExport: now() };
-  persist(bank);
-  const blob = new Blob([JSON.stringify(bank, null, 2)], { type: "application/json" });
+  const shared = loadBank();
+  shared.drive = { ...shared.drive, lastExport: now() };
+  persist(shared);
+  const bundle = {
+    version: 3,
+    exportedAt: now(),
+    owner: "Vardet777",
+    shared,
+    agents: Object.fromEntries(ISOLATED_AGENTS.map((agent) => [agent, loadAgentBank(agent)]))
+  };
+  const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = DRIVE_FILE;
   a.click();
   addEvent({ agent: "linnea", kind: "export", text: DRIVE_FILE });
-  return bank;
+  return bundle;
 }
 
 export async function importFile(file) {
   const data = JSON.parse(await file.text());
-  const bank = mergeBank(data);
+  const bundle = data?.agents ? data : { shared: data, agents: {} };
+  for (const agent of ISOLATED_AGENTS) {
+    if (bundle.agents?.[agent]) persistAgent(agent, bundle.agents[agent]);
+  }
+  const bank = mergeBank({ shared: bundle.shared || {} });
   addEvent({ agent: "linnea", kind: "import", text: file.name || DRIVE_FILE });
   return bank;
 }
