@@ -4,9 +4,9 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <title>Free-Plugins — Linnea</title>
-<link rel="stylesheet" href="./css/site.css?v=24"/>
-<link rel="stylesheet" href="./css/photos-a.css?v=24"/>
-<link rel="stylesheet" href="./css/photos.css?v=24"/>
+<link rel="stylesheet" href="./css/site.css?v=25"/>
+<link rel="stylesheet" href="./css/photos-a.css?v=25"/>
+<link rel="stylesheet" href="./css/photos.css?v=25"/>
 </head>
 <body>
   <div class="wrap">
@@ -27,6 +27,16 @@
         <form class="stack" id="f" style="margin-top:12px">
           <input id="t" placeholder="skriv här eller tryck Prata" autocomplete="off"/>
         </form>
+        <div class="plugin-dock" id="plugins" aria-label="Plugins">
+          <button type="button" data-cmd="klarhet">Klarhet</button>
+          <button type="button" data-cmd="beslut">Beslut</button>
+          <button type="button" data-cmd="plan">Plan</button>
+          <button type="button" data-cmd="fokus">Fokus</button>
+          <button type="button" data-cmd="granska">Granska</button>
+          <button type="button" data-cmd="risk">Risk</button>
+          <button type="button" data-cmd="juridiken">Juridiken</button>
+          <button type="button" data-cmd="atlas">Atlas</button>
+        </div>
         <div class="talk-dock">
           <button type="button" id="talk">Prata</button>
           <button type="submit" form="f">Skicka</button>
@@ -97,6 +107,13 @@
       document.getElementById("talk").addEventListener("click", function () {
         holdAudioSession();
         speak(lastText());
+      });
+      var plug = document.getElementById("plugins");
+      if (plug) plug.addEventListener("click", function (ev) {
+        var btn = ev.target.closest("[data-cmd]");
+        if (!btn) return;
+        input.value = btn.getAttribute("data-cmd");
+        document.getElementById("f").requestSubmit();
       });
       document.getElementById("f").addEventListener("submit", function (e) {
         e.preventDefault();
