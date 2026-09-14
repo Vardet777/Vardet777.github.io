@@ -1,12 +1,13 @@
 {
-  "version": "1.1.0",
+  "version": "1.1.1",
   "published": false,
   "loginWall": true,
-  "agent": "Linnea",
-  "replaced": "Kent",
-  "note": "Verkstad. Inga påhittade tredjepartsposter. Originalpack får ligga här.",
+  "agents": ["linnea", "kent"],
+  "agentMemory": "private-per-agent",
+  "note": "Verkstad. Inga påhittade tredjeposts. Originalpack får ligga här.",
   "ads": false,
-  "sharedMemory": "local+onedrive-export",
+  "memory": "local-cache+json-export-import",
+  "externalMemory": "google-drive-pending",
   "items": [
     {
       "id": "free-plugins-hem-v1",
@@ -16,7 +17,7 @@
       "betal": false,
       "position": 1,
       "category": "hem",
-      "tags": ["sajt", "repo", "pack", "linnea"],
+      "tags": ["sajt", "repo", "pack", "linnea", "kent"],
       "text": "Pekar ut sajten, innehållet och repot. Inte publicerad som produkt.",
       "cover": "./img/skull-fire.jpg",
       "pack": "packs/free-plugins-hem-v1.json",
