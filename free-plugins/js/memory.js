@@ -74,6 +74,17 @@ function persist(bank) {
 
 export function saveBank(bank) { return persist(bank); }
 
+function stripIsolatedFromShared(bank) {
+  const isolated = new Set(ISOLATED_AGENTS);
+  const next = {
+    ...bank,
+    facts: bank.facts.filter((row) => !isolated.has(row?.agent || "")),
+    events: bank.events.filter((row) => !isolated.has(row?.agent || "")),
+    works: bank.works.filter((row) => !isolated.has(row?.agent || ""))
+  };
+  return persist(next);
+}
+
 function migrateLegacyAgent(agent) {
   const key = AGENT_MEMORY_KEYS[agent];
   if (!key) return emptyBank();
@@ -89,6 +100,7 @@ function migrateLegacyAgent(agent) {
     });
     localStorage.setItem(key, JSON.stringify(migrated));
     localStorage.setItem(marker, "1");
+    stripIsolatedFromShared(legacy);
     return migrated;
   } catch {
     return emptyBank();
