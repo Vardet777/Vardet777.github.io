@@ -85,25 +85,25 @@ function stripIsolatedFromShared(bank) {
   return persist(next);
 }
 
-function migrateLegacyAgent(agent) {
-  const key = AGENT_MEMORY_KEYS[agent];
-  if (!key) return emptyBank();
-  const marker = `${key}.initialized`;
+function migrateLegacyAgents() {
+  const legacy = loadBank();
   try {
-    if (localStorage.getItem(marker) === "1") return normalizeBank(JSON.parse(localStorage.getItem(key) || "{}"));
-    const legacy = loadBank();
-    const migrated = normalizeBank({
-      ...legacy,
-      facts: legacy.facts.filter((row) => (row.agent || "linnea") === agent),
-      events: legacy.events.filter((row) => (row.agent || "linnea") === agent),
-      works: legacy.works.filter((row) => (row.agent || "skapa") === agent)
-    });
-    localStorage.setItem(key, JSON.stringify(migrated));
-    localStorage.setItem(marker, "1");
+    for (const agent of ISOLATED_AGENTS) {
+      const key = AGENT_MEMORY_KEYS[agent];
+      const marker = `${key}.initialized`;
+      if (localStorage.getItem(marker) === "1") continue;
+      const migrated = normalizeBank({
+        ...legacy,
+        facts: legacy.facts.filter((row) => (row.agent || "linnea") === agent),
+        events: legacy.events.filter((row) => (row.agent || "linnea") === agent),
+        works: legacy.works.filter((row) => (row.agent || "skapa") === agent)
+      });
+      localStorage.setItem(key, JSON.stringify(migrated));
+      localStorage.setItem(marker, "1");
+    }
     stripIsolatedFromShared(legacy);
-    return migrated;
   } catch {
-    return emptyBank();
+    return;
   }
 }
 
@@ -112,7 +112,7 @@ export function loadAgentBank(agent) {
   if (!AGENT_MEMORY_KEYS[name]) return loadBank();
   try {
     const key = AGENT_MEMORY_KEYS[name];
-    if (!localStorage.getItem(`${key}.initialized`)) return migrateLegacyAgent(name);
+    if (!localStorage.getItem(`${key}.initialized`)) migrateLegacyAgents();
     return normalizeBank(JSON.parse(localStorage.getItem(key) || "{}"));
   } catch {
     return emptyBank();
@@ -132,19 +132,21 @@ function persistAgent(agent, bank) {
 }
 
 export function addEvent({ agent = "linnea", kind = "note", text = "", data = null } = {}) {
-  const bank = ISOLATED_AGENTS.includes(agent) ? loadAgentBank(agent) : loadBank();
+  const isolated = ISOLATED_AGENTS.includes(agent);
+  const bank = isolated ? loadAgentBank(agent) : loadBank();
   bank.events.push({ id: crypto.randomUUID(), at: now(), agent, kind, text: String(text || "").slice(0, 4000), data });
-  return ISOLATED_AGENTS.includes(agent) ? persistAgent(agent, bank) : saveBank(bank);
+  return isolated ? persistAgent(agent, bank) : saveBank(bank);
 }
 
 export function addFact({ agent = "linnea", text = "", tags = [] } = {}) {
+  const isolated = ISOLATED_AGENTS.includes(agent);
   const clean = String(text || "").trim();
-  if (!clean) return ISOLATED_AGENTS.includes(agent) ? loadAgentBank(agent) : loadBank();
-  const bank = ISOLATED_AGENTS.includes(agent) ? loadAgentBank(agent) : loadBank();
+  if (!clean) return isolated ? loadAgentBank(agent) : loadBank();
+  const bank = isolated ? loadAgentBank(agent) : loadBank();
   if (!bank.facts.some((f) => f.text.toLowerCase() === clean.toLowerCase())) {
     bank.facts.push({ id: crypto.randomUUID(), at: now(), agent, text: clean.slice(0, 500), tags });
   }
-  return ISOLATED_AGENTS.includes(agent) ? persistAgent(agent, bank) : saveBank(bank);
+  return isolated ? persistAgent(agent, bank) : saveBank(bank);
 }
 
 export function addWork(work) {
