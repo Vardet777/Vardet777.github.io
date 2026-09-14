@@ -52,6 +52,20 @@ test("Linnea and Kent use isolated memory stores", () => {
   assert.match(memory, /stripIsolatedFromShared/);
 });
 
+test("Private-memory UI stays explicit and points to the correct agent store", () => {
+  const index = read("index.html");
+  const linnea = read("linnea.html");
+  const kent = read("kent.html");
+  const shell = read("js/shell.js");
+  assert.match(index, /separata privata minnesgrunder/);
+  assert.match(index, /Linnea[\s\S]*egen privat minnesgrund/);
+  assert.match(index, /Kent[\s\S]*egen privat minnesgrund/);
+  assert.match(linnea, /loadAgentBank\("linnea"\)/);
+  assert.match(kent, /loadAgentBank\("kent"\)/);
+  assert.match(kent, /Kents privata minne/);
+  assert.match(shell, /Linnea · Kent · separata minnen · verkstad/);
+});
+
 test("Kent must not describe Linnea's private memory as shared", () => {
   const source = read("js/kent.js");
   assert.match(source, /Kents egen minneskontext/);
