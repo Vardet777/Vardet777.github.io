@@ -9,6 +9,9 @@
   "attribution": "Originaltexter, Vardet777",
   "source": "original",
   "owner": "Vardet777",
+  "catalogPosition": 2,
+  "does": "Tre originalrecept i kokboksformat. Ingen känd kocks namn. Inte skrapat.",
+  "capabilities": ["search_recipes", "render_cookbook_page"],
   "items": [
     {
       "id": "ugnsstekt-rotfruktsgryta",
@@ -16,9 +19,22 @@
       "servings": 4,
       "timeMinutes": 55,
       "difficulty": "lätt",
-      "tags": ["vegetarisk"],
-      "ingredients": [{"amount": "4 st", "name": "morötter"}, {"amount": "1 st", "name": "lök"}],
-      "steps": ["Sätt ugnen på 200 grader.", "Skär och blanda.", "Grädda 40 minuter."]
+      "tags": ["vegetarisk", "ugn", "vinter"],
+      "ingredients": [
+        {"amount": "4 st", "name": "morötter"},
+        {"amount": "2 st", "name": "palsternackor"},
+        {"amount": "1 st", "name": "lök"},
+        {"amount": "2 msk", "name": "olja"},
+        {"amount": "1 tsk", "name": "salt"},
+        {"amount": "1 kvist", "name": "timjan"}
+      ],
+      "steps": [
+        "Sätt ugnen på 200 grader.",
+        "Skär rotfrukter och lök i grova bitar.",
+        "Blanda med olja, salt och timjan i en form.",
+        "Grädda 40–45 minuter tills bitarna är mjuka och får yta.",
+        "Vila tre minuter och servera varm."
+      ]
     },
     {
       "id": "panna-med-agg-och-potatis",
@@ -26,19 +42,41 @@
       "servings": 2,
       "timeMinutes": 25,
       "difficulty": "lätt",
-      "tags": ["snabb"],
-      "ingredients": [{"amount": "4 st", "name": "kokta potatisar"}, {"amount": "2 st", "name": "ägg"}],
-      "steps": ["Stek potatisen.", "Knäck i äggen.", "Krydda."]
+      "tags": ["snabb", "vardag"],
+      "ingredients": [
+        {"amount": "4 st", "name": "kokta potatisar"},
+        {"amount": "2 st", "name": "ägg"},
+        {"amount": "1 msk", "name": "smör"},
+        {"amount": "1 krm", "name": "svartpeppar"},
+        {"amount": "efter smak", "name": "gräslök"}
+      ],
+      "steps": [
+        "Skär potatisen i skivor.",
+        "Stek i smör tills den får färg.",
+        "Gör två gropar och knäck i äggen.",
+        "Stek på låg värme tills vitan stannat.",
+        "Krydda och strö över gräslök."
+      ]
     },
     {
       "id": "havregryngrot-med-bar",
-      "title": "Havregrynsgröt med bär",
+      "title": "Havregrynsgrot med bär",
       "servings": 1,
       "timeMinutes": 10,
       "difficulty": "lätt",
-      "tags": ["frukost"],
-      "ingredients": [{"amount": "1 dl", "name": "havregryn"}, {"amount": "2 dl", "name": "vätska"}],
-      "steps": ["Koka grynen.", "Vila.", "Lägg på bär."]
+      "tags": ["frukost", "snabb"],
+      "ingredients": [
+        {"amount": "1 dl", "name": "havregryn"},
+        {"amount": "2 dl", "name": "vatten eller mjölk"},
+        {"amount": "1 krm", "name": "salt"},
+        {"amount": "1 dl", "name": "frysta bär"}
+      ],
+      "steps": [
+        "Koka upp gryn, vätska och salt under omrörning.",
+        "Sjud tre till fyra minuter.",
+        "Dra av värmen och vila en minut.",
+        "Lägg på bären och ät med en gång."
+      ]
     }
   ]
 }
