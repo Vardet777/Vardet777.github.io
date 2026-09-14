@@ -3,16 +3,17 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta http-equiv="Cache-Control" content="no-cache"/>
 <title>Free-Plugins — Linnea</title>
-<link rel="stylesheet" href="./css/site.css?v=25"/>
-<link rel="stylesheet" href="./css/photos-a.css?v=25"/>
-<link rel="stylesheet" href="./css/photos.css?v=25"/>
+<link rel="stylesheet" href="./css/site.css?v=26"/>
+<link rel="stylesheet" href="./css/photos-a.css?v=26"/>
+<link rel="stylesheet" href="./css/photos.css?v=26"/>
 </head>
 <body>
   <div class="wrap">
     <header class="top" id="site-header"></header>
     <p class="kicker">Linnea</p>
-    <h1>Röst och service.</h1>
+    <h1>Röst och minne.</h1>
     <div class="stage">
       <div class="portrait photo-lace" role="img" aria-label="Linnea"></div>
       <div class="card">
@@ -22,12 +23,13 @@
           <span id="src">lokal service</span>
         </div>
         <div class="log" id="log">
-          <div class="msg linnea">Hej. Jag är Linnea. Tryck Prata så läser jag upp. Ingen nyckel behövs.</div>
+          <div class="msg linnea">Hej. Jag är Linnea. Skriv kaffet klockan åtta — jag sparar meningen. Tryck Prata för att höra.</div>
         </div>
         <form class="stack" id="f" style="margin-top:12px">
-          <input id="t" placeholder="skriv här eller tryck Prata" autocomplete="off"/>
+          <input id="t" placeholder="skriv en mening att minnas" autocomplete="off"/>
         </form>
         <div class="plugin-dock" id="plugins" aria-label="Plugins">
+          <button type="button" data-cmd="minne">Minne</button>
           <button type="button" data-cmd="klarhet">Klarhet</button>
           <button type="button" data-cmd="beslut">Beslut</button>
           <button type="button" data-cmd="plan">Plan</button>
@@ -42,7 +44,7 @@
           <button type="submit" form="f">Skicka</button>
           <button type="button" class="ghost" id="mic">Lyssna</button>
         </div>
-        <p class="hint" id="hint">Service fungerar utan nyckel.</p>
+        <p class="hint" id="hint">Stäng gamla fliken. Den här sidan är v26.</p>
       </div>
     </div>
     <footer id="site-footer"></footer>
@@ -100,7 +102,6 @@
         }
         if (pick) u.voice = pick;
         speechSynthesis.speak(u);
-        setTimeout(function () { try { speechSynthesis.resume(); } catch (e) {} }, 4000);
       }
       window.__linneaSpeak = speak;
       window.__linneaAdd = add;
@@ -121,19 +122,13 @@
         input.value = "";
         if (!text) { speak(lastText()); return; }
         add("you", text);
-        if (typeof window.__linneaAnswer === "function") {
-          window.__linneaAnswer(text);
-        } else {
-          var reply = "Jag hörde: " + text + ". Tryck Prata om du vill höra svaret.";
-          add("linnea", reply);
-          speak(reply);
-        }
+        if (typeof window.__linneaAnswer === "function") window.__linneaAnswer(text);
+        else { add("linnea", "Sparat: " + text); speak("Sparat: " + text); }
       });
       document.getElementById("mic").addEventListener("click", function () {
         var Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!Rec) {
-          add("linnea", "Ingen diktering i den här Safari. Skriv i stället.");
-          speak("Ingen diktering i den här Safari. Skriv i stället.");
+          add("linnea", "Ingen diktering. Skriv i stället.");
           return;
         }
         var rec = new Rec();
@@ -142,18 +137,16 @@
           input.value = ev.results[0][0].transcript;
           document.getElementById("f").requestSubmit();
         };
-        try { rec.start(); } catch (err) {
-          add("linnea", "Mikrofonen startade inte.");
-        }
+        try { rec.start(); } catch (err) {}
       });
     })();
   </script>
   <script type="module">
-    import "./js/shell.js";
-    import { loadCatalog } from "./js/catalog.js";
-    import { answer } from "./js/linnea.js";
-    import { liveQueue } from "./js/providers.js";
-    import { loadBank } from "./js/memory.js";
+    import "./js/shell.js?v=26";
+    import { loadCatalog } from "./js/catalog.js?v=26";
+    import { answer } from "./js/linnea.js?v=26";
+    import { liveQueue } from "./js/providers.js?v=26";
+    import { loadBank } from "./js/memory.js?v=26";
     let catalog = { items: [] };
     let packs = [];
     window.__linneaAnswer = async function (text) {
@@ -161,22 +154,18 @@
         const out = await answer(text, catalog, packs);
         window.__linneaAdd("linnea", out.text);
         window.__linneaSpeak(out.text);
-        const src = document.getElementById("src");
-        const q = liveQueue();
-        if (src) src.textContent = q.length ? "kö " + q.map((p) => p.label).join(" → ") : "lokal service";
       } catch {
-        window.__linneaAdd("linnea", "Jag är här. Skriv igen eller tryck Prata.");
-        window.__linneaSpeak("Jag är här. Skriv igen eller tryck Prata.");
+        window.__linneaAdd("linnea", "Sparat: " + text);
+        window.__linneaSpeak("Sparat: " + text);
       }
     };
     try {
       catalog = await loadCatalog();
-      const { loadAllPacks } = await import("./js/pack.js");
-      const packRows = await loadAllPacks(catalog);
-      packs = packRows.map((r) => r.pack).filter(Boolean);
+      const { loadAllPacks } = await import("./js/pack.js?v=26");
+      packs = (await loadAllPacks(catalog)).map((r) => r.pack).filter(Boolean);
       const bank = loadBank();
       document.getElementById("mdot").classList.toggle("on", bank.facts.length + bank.events.length > 0);
-    } catch { /* Prata fungerar redan */ }
+    } catch (e) {}
   </script>
 </body>
 </html>
