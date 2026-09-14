@@ -39,3 +39,14 @@ test("Linnea and Kent are separate first-class agents", () => {
   assert.match(memory, /\"linnea\"/);
   assert.match(memory, /\"kent\"/);
 });
+
+test("Linnea and Kent use isolated memory stores", () => {
+  const memory = read("js/memory.js");
+  assert.match(memory, /AGENT_MEMORY_KEYS/);
+  assert.match(memory, /fp\.memory\.linnea/);
+  assert.match(memory, /fp\.memory\.kent/);
+  assert.match(memory, /loadAgentBank\(agent\)/);
+  assert.match(memory, /contextForAgent\(agent\)[\s\S]*loadAgentBank\(agent\)/);
+  assert.match(memory, /addFact\(\{ agent/);
+  assert.match(memory, /addEvent\(\{ agent/);
+});
