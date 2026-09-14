@@ -1,5 +1,5 @@
 const KEY = "fp.shared.memory";
-export const AGENTS = ["linnea", "katalog", "skapa", "pack"];
+export const AGENTS = ["linnea", "kent", "katalog", "skapa", "pack"];
 export const DRIVE_FOLDER = "Gemensamt-AI-minne";
 export const DRIVE_OWNER_EMAIL = "lundgrennisse@gmail.com";
 export const DRIVE_FOLDER_ID = "";
