@@ -4,12 +4,7 @@
   "ownerEmail": "lundgrennisse@gmail.com",
   "folder": "Gemensamt-AI-minne",
   "folderId": "",
-  "folderUrl": "",
   "fileName": "gemensamt-ai-minne.json",
   "fileId": "",
-  "fileUrl": "",
-  "docUrl": "",
-  "status": "pending-owner-drive",
-  "note": "Inga Drive-ID förrän kopplingen ägs av lundgrennisse@gmail.com.",
-  "replaced": ["Outlook", "OneDrive", "Linnea/shared-memory.json", "Linnea/linnea-drive-memory.json"]
+  "status": "pending-owner-drive"
 }
