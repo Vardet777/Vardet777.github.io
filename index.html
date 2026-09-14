@@ -4,148 +4,160 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Linnea"/>
 <meta name="theme-color" content="#050506"/>
-<meta name="mobile-web-app-capable" content="yes"/>
 <link rel="manifest" href="manifest.webmanifest"/>
 <link rel="apple-touch-icon" href="icons/linnea.svg"/>
-<link rel="icon" href="icons/linnea.svg" type="image/svg+xml"/>
 <title>Linnea</title>
 <style>
 :root{--ember:#e07a4a;--ink:#f3e6dc;--muted:#9a8078}
-*{box-sizing:border-box}html,body{height:100%;margin:0}
-body{font-family:Georgia,serif;color:var(--ink);display:flex;flex-direction:column;background:#050506;overflow:hidden}
-.stage{position:fixed;inset:-16%;background:#120805;animation:drift 16s ease-in-out infinite alternate;z-index:0}
-.embers{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 30% 110%,#e07a4a44 0 12%,transparent 36%);animation:flicker 2.2s ease-in-out infinite alternate}
-.veil{position:fixed;inset:0;background:linear-gradient(180deg,#000000c0 0%,#00000040 36%,#14080599 100%);z-index:0}
-@keyframes drift{from{transform:scale(1.05)}to{transform:scale(1.18) translate3d(-2%,-3%,0)}}
-@keyframes flicker{from{opacity:.65}to{opacity:1}}
-header,main,#sheet,#install{position:relative;z-index:1}
-header{padding:max(16px,env(safe-area-inset-top)) 14px 10px;display:flex;gap:12px;align-items:center}
-.avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;object-position:center 18%;border:1px solid var(--ember)}
-header strong{color:var(--ember);font-size:20px}
-#status{font:11px ui-sans-serif,system-ui;color:var(--muted)}
-#install{margin:0 14px;padding:8px 10px;border-radius:12px;background:#120c0caa;border:1px solid #3a2220;font:12px ui-sans-serif,system-ui;color:var(--ink)}
-main{flex:1;min-height:0;display:flex;flex-direction:column;padding:8px 14px 0}
-#log{flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px}
-.msg{max-width:88%;padding:11px 14px;border-radius:18px;white-space:pre-wrap;line-height:1.45}
+*{box-sizing:border-box}html,body{height:100%;margin:0;background:#050506;color:var(--ink);font-family:Georgia,serif}
+body{display:flex;flex-direction:column;padding:max(14px,env(safe-area-inset-top)) 14px calc(16px + env(safe-area-inset-bottom))}
+header{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.av{width:48px;height:48px;border-radius:50%;background:#3a1616;border:1px solid var(--ember)}
+strong{color:var(--ember)}
+#status{font:12px ui-sans-serif,system-ui;color:var(--muted)}
+#log{flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px;min-height:160px}
+.msg{max-width:90%;padding:11px 14px;border-radius:18px;white-space:pre-wrap;line-height:1.4}
 .linnea{align-self:flex-start;background:#1c0f0eee}
-.user{align-self:flex-end;background:#3a1616ee}
-.meta{font:10px ui-sans-serif,system-ui;color:var(--muted);margin-top:6px}
-form{display:flex;flex-direction:column;gap:8px;padding:10px 0 calc(22px + env(safe-area-inset-bottom))}
-#t{width:100%;padding:13px 14px;border-radius:16px;border:1px solid #4a2a24;background:#0c0808ee;color:var(--ink);font-size:16px}
-.actions{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px}
-button{background:var(--ember);color:#1a0c08;border:0;border-radius:16px;padding:13px 14px;font:600 15px ui-sans-serif,system-ui}
-button.ghost{background:#120c0caa;color:var(--ink);border:1px solid #3a2220}
-button.hot{background:#7a1a08;color:var(--ink)}
-#sheet{position:fixed;inset:0;background:#0008;display:flex;align-items:flex-end;z-index:30}
-#sheet[hidden]{display:none}
-.panel{background:#120c0cf2;width:100%;border-radius:22px 22px 0 0;padding:18px 16px calc(28px + env(safe-area-inset-bottom));font-family:ui-sans-serif,system-ui;max-height:86%;overflow:auto}
-.panel h2{color:var(--ember);font-family:Georgia,serif;margin:0 0 8px}
-.panel p,.hint{color:var(--muted);font-size:12px}
-.panel label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
-.panel input[type=text],.panel input[type=password],.panel input[type=url],.panel input[type=file],.panel select{width:100%;padding:10px 12px;border-radius:12px;border:1px solid #4a2a24;background:#0c0808ee;color:var(--ink);font-size:16px}
-.row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-.panel ul{margin:6px 0 10px;padding-left:18px}
-.panel li{margin:4px 0}
-.panel li.empty{color:var(--muted);list-style:none;margin-left:-18px}
-.site-nav{display:flex;gap:8px;padding:0 14px 8px;position:relative;z-index:1;font:12px ui-sans-serif,system-ui}
-.site-nav button{background:#120c0caa;color:var(--ink);border:1px solid #3a2220;border-radius:999px;padding:6px 10px;font:12px ui-sans-serif,system-ui}
-.site-nav .later{opacity:.45}
-.plugins{display:flex;gap:6px;overflow-x:auto;padding:0 14px 8px;position:relative;z-index:1;-webkit-overflow-scrolling:touch}
-.plugins button{flex:0 0 auto;background:#1c0f0eee;color:var(--ink);border:1px solid #3a2220;border-radius:999px;padding:8px 12px;font:600 12px ui-sans-serif,system-ui}
+.you{align-self:flex-end;background:#3a1616ee}
+.plugins{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.plugins button{background:#1c0f0eee;color:var(--ink);border:1px solid #3a2220;border-radius:999px;padding:8px 12px;font:600 12px ui-sans-serif,system-ui}
+#t{width:100%;padding:13px 14px;border-radius:16px;border:1px solid #4a2a24;background:#0c0808;color:var(--ink);font-size:16px}
+.row{display:flex;gap:8px;margin-top:8px}
+button.main{flex:1;background:var(--ember);color:#1a0c08;border:0;border-radius:16px;padding:14px;font:600 16px ui-sans-serif,system-ui}
+button.ghost{flex:1;background:#120c0c;color:var(--ink);border:1px solid #3a2220;border-radius:16px;padding:14px;font:600 16px ui-sans-serif,system-ui}
+.hint{font:12px ui-sans-serif,system-ui;color:var(--muted);margin-top:8px}
 </style>
 </head>
 <body>
-<div class="stage" aria-hidden="true"></div>
-<div class="embers" aria-hidden="true"></div>
-<div class="veil" aria-hidden="true"></div>
 <header>
-  <img class="avatar" alt="Linnea" src="icons/linnea.svg"/>
-  <div style="flex:1"><strong>Linnea</strong><div id="status">på enheten</div></div>
-  <button type="button" class="ghost" id="open-sheet">Inställningar</button>
+  <div class="av" aria-hidden="true"></div>
+  <div><strong>Linnea</strong><div id="status">v27 · lokal · ingen nyckel</div></div>
 </header>
-<nav class="site-nav" aria-label="Linnea-sajt">
-  <button type="button" data-go="chat">Prata</button>
-  <button type="button" data-go="plugins">Plugins</button>
-  <button type="button" class="later" id="login-later">Inloggning sist</button>
-</nav>
-<div class="plugins" id="plugin-dock" hidden>
-  <button type="button" data-cmd="plugins">vad kan du</button>
-  <button type="button" data-cmd="klarhet: ">klarhet</button>
-  <button type="button" data-cmd="beslut: ">beslut</button>
-  <button type="button" data-cmd="plan: ">plan</button>
-  <button type="button" data-cmd="fokus: ">fokus</button>
-  <button type="button" data-cmd="granska: ">granska</button>
-  <button type="button" data-cmd="risk: ">risk</button>
-  <button type="button" data-cmd="juridiken">juridiken</button>
-  <button type="button" data-cmd="revidera">revidera</button>
-  <button type="button" data-cmd="vilka projekt har vi">projekt</button>
-  <button type="button" data-cmd="läge">läge</button>
+<div id="log"></div>
+<div class="plugins" id="plugins">
+  <button type="button" data-cmd="minne">Minne</button>
+  <button type="button" data-cmd="klarhet">Klarhet</button>
+  <button type="button" data-cmd="beslut">Beslut</button>
+  <button type="button" data-cmd="plan">Plan</button>
+  <button type="button" data-cmd="fokus">Fokus</button>
+  <button type="button" data-cmd="juridiken">Juridiken</button>
 </div>
-<div id="install" hidden></div>
-<main>
-  <div id="log"></div>
-  <form id="f">
-    <input id="t" placeholder="Skriv till Linnea…" enterkeyhint="send" autocomplete="off"/>
-    <div class="actions">
-      <button type="button" class="ghost" id="mic">Prata</button>
-      <button type="submit">Skicka</button>
-      <button type="button" class="ghost" id="speak-last">Läs upp</button>
-      <button type="button" class="ghost" id="open-sheet-2">•••</button>
-    </div>
-  </form>
-</main>
-<div id="sheet" hidden>
-  <div class="panel">
-    <h2>Linnea</h2>
-    <p>En källa. Nyckeln stannar på telefonen. Inte Viccy. Inte Queen.</p>
-    <label>Minnen</label>
-    <ul id="mem-list"></ul>
-    <div class="row">
-      <input id="mem-new" type="text" placeholder="kom ihåg …"/>
-      <button type="button" id="mem-add">Spara</button>
-    </div>
-    <label>Dagbok (lokal, inte mejlad)</label>
-    <ul id="diary-list"></ul>
-    <div class="row">
-      <input id="diary-new" type="text" placeholder="dagens rad"/>
-      <button type="button" id="diary-add">Anteckna</button>
-    </div>
-    <p class="hint">Kö: kommando → Groq → OpenRouter free → lokal. xAI bara om rutan är ikryssad. Copilot, Gemini, Claude, deep search: saknar väg. Inloggning är sist och inte byggd.</p>
-    <label>Groq-nyckel (valfri)</label>
-    <input id="groq-key" type="password" autocomplete="off"/>
-    <label>OpenRouter-nyckel (valfri)</label>
-    <input id="or-key" type="password" autocomplete="off"/>
-    <label>xAI-bas</label>
-    <input id="llm-base" type="url" placeholder="https://api.x.ai/v1"/>
-    <label>xAI-modell</label>
-    <input id="llm-model" type="text" placeholder="grok-4.6"/>
-    <label>xAI-nyckel</label>
-    <input id="llm-key" type="password" autocomplete="off"/>
-    <label><input id="use-xai" type="checkbox"/> Använd xAI sist</label>
-    <label><input id="voice-on" type="checkbox" checked/> Läs upp svar</label>
-    <label>Röst på telefonen</label>
-    <select id="voice-pick"></select>
-    <label>Datorns adress för sync</label>
-    <input id="pair-url" type="url" placeholder="http://192.168.x.x:8787"/>
-    <label>Parningskod</label>
-    <input id="pair-token" type="password" autocomplete="off"/>
-    <div class="row">
-      <button type="button" class="ghost" id="sync-pull">Hämta</button>
-      <button type="button" class="ghost" id="sync-push">Skicka</button>
-    </div>
-    <div class="row">
-      <button type="button" class="ghost" id="export-btn">Exportera</button>
-      <input id="import-file" type="file" accept="application/json"/>
-    </div>
-    <div class="row">
-      <button type="button" id="save-settings">Spara</button>
-      <button type="button" class="ghost" id="close-sheet">Stäng</button>
-    </div>
+<form id="f">
+  <input id="t" placeholder="skriv en mening, t.ex. kaffet klockan åtta" autocomplete="off"/>
+  <div class="row">
+    <button class="main" type="submit">Skicka</button>
+    <button class="ghost" type="button" id="talk">Prata</button>
+    <button class="ghost" type="button" id="mic">Lyssna</button>
   </div>
-</div>
-<script type="module" src="js/app.js"></script>
+</form>
+<p class="hint" id="hint">En mening du skriver sparas. Tryck Prata för att höra.</p>
+<script>
+(function () {
+  var KEY = "linnea.facts.v27";
+  var log = document.getElementById("log");
+  var input = document.getElementById("t");
+  var hint = document.getElementById("hint");
+  var status = document.getElementById("status");
+  function facts() {
+    try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch (e) { return []; }
+  }
+  function saveFact(text) {
+    var list = facts();
+    if (!list.some(function (f) { return f.toLowerCase() === text.toLowerCase(); })) {
+      list.push(text);
+      localStorage.setItem(KEY, JSON.stringify(list.slice(-80)));
+    }
+  }
+  function add(role, text) {
+    var d = document.createElement("div");
+    d.className = "msg " + role;
+    d.textContent = text;
+    log.appendChild(d);
+    d.scrollIntoView({ block: "end" });
+  }
+  function lastLinnea() {
+    var nodes = log.querySelectorAll(".msg.linnea");
+    return (nodes[nodes.length - 1] && nodes[nodes.length - 1].textContent) || "Hej. Jag är Linnea.";
+  }
+  function pickVoice() {
+    var list = [];
+    try { list = speechSynthesis.getVoices() || []; } catch (e) {}
+    var pick = null;
+    for (var i = 0; i < list.length; i++) {
+      var v = list[i];
+      var blob = ((v.name || "") + " " + (v.lang || "")).toLowerCase();
+      if (/evie|zelda|oskar|ingmar|erik|magnus/.test(blob)) continue;
+      if (/^sv/.test(v.lang || "") && /alva|elin|klara|ebba|sofie|freja/.test(blob)) return v;
+      if (!pick && /^sv/.test(v.lang || "")) pick = v;
+    }
+    return pick;
+  }
+  function speak(text) {
+    if (!window.speechSynthesis) { hint.textContent = "Ingen uppläsning i den här Safari."; return; }
+    var clean = String(text || "").replace(/\s+/g, " ").trim();
+    if (!clean) return;
+    try { speechSynthesis.cancel(); speechSynthesis.resume(); } catch (e) {}
+    var u = new SpeechSynthesisUtterance(clean.slice(0, 900));
+    u.lang = "sv-SE";
+    u.rate = 0.98;
+    var v = pickVoice();
+    if (v) u.voice = v;
+    status.textContent = "v27 · lokal · " + ((v && v.name) || "sv-SE");
+    speechSynthesis.speak(u);
+  }
+  function reply(t) {
+    t = String(t || "").trim();
+    if (/^minne\b/i.test(t)) {
+      var list = facts();
+      return list.length ? "Minne:\n- " + list.join("\n- ") : "Minnet är tomt.";
+    }
+    if (/^klarhet/i.test(t)) return "Klarhet: den här sidan är Linnea på telefonen. En mening sparas. Prata läser upp.";
+    if (/^beslut/i.test(t)) return "Beslut: sajten är förhandsvisning. Drive väntar på lundgrennisse@gmail.com.";
+    if (/^plan/i.test(t)) return "Plan: skriv en mening. Tryck Prata.";
+    if (/^fokus/i.test(t)) return "Fokus: minne och röst på iPhone.";
+    if (/^juridiken/i.test(t)) return "IP Vardet777. Inte juridisk rådgivning.";
+    if (/^(vad kan du|hjälp|plugins)/i.test(t)) return "Jag sparar meningar och läser upp dem. Säg minne för listan.";
+    var m = t.match(/^(kom ihåg|minns|spara)\s*[:\-]?\s*(.+)$/i);
+    var fact = m ? m[2] : t;
+    saveFact(fact);
+    return "Sparat: " + fact;
+  }
+  function send(text) {
+    if (!text) { speak(lastLinnea()); return; }
+    add("you", text);
+    var out = reply(text);
+    add("linnea", out);
+    speak(out);
+  }
+  add("linnea", "Hej. Jag är Linnea. Skriv kaffet klockan åtta — jag sparar meningen. Tryck Prata för att höra.");
+  document.getElementById("f").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var text = input.value.trim();
+    input.value = "";
+    send(text);
+  });
+  document.getElementById("talk").addEventListener("click", function () {
+    try { speechSynthesis.resume(); } catch (e) {}
+    speak(lastLinnea());
+  });
+  document.getElementById("mic").addEventListener("click", function () {
+    var Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!Rec) { add("linnea", "Ingen diktering. Skriv i stället."); return; }
+    var rec = new Rec();
+    rec.lang = "sv-SE";
+    rec.onresult = function (ev) { send(ev.results[0][0].transcript); };
+    try { rec.start(); } catch (e) {}
+  });
+  document.getElementById("plugins").addEventListener("click", function (ev) {
+    var b = ev.target.closest("[data-cmd]");
+    if (b) send(b.getAttribute("data-cmd"));
+  });
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js?v=27");
+  }
+})();
+</script>
 </body>
 </html>
