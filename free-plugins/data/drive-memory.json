@@ -1,12 +1,15 @@
 {
   "backend": "google-drive",
   "owner": "Vardet777",
+  "ownerEmail": "lundgrennisse@gmail.com",
   "folder": "Gemensamt-AI-minne",
-  "folderId": "1ncKVnykpC7XTsMAKHVqn6L43_kEhygXM",
-  "folderUrl": "https://drive.google.com/drive/folders/1ncKVnykpC7XTsMAKHVqn6L43_kEhygXM",
+  "folderId": "",
+  "folderUrl": "",
   "fileName": "gemensamt-ai-minne.json",
-  "fileId": "1EiFXug8dHGyRJmRYRPn_dtP3N2J1QXbJ",
-  "fileUrl": "https://drive.google.com/file/d/1EiFXug8dHGyRJmRYRPn_dtP3N2J1QXbJ/view",
-  "docUrl": "https://docs.google.com/document/d/1xGtI2oetkIBMW2QtH1aH7xuNC3nSs9hiUXrYN899uhc/edit",
-  "replaced": ["Outlook", "OneDrive"]
+  "fileId": "",
+  "fileUrl": "",
+  "docUrl": "",
+  "status": "pending-owner-drive",
+  "note": "Inga Drive-ID förrän kopplingen ägs av lundgrennisse@gmail.com.",
+  "replaced": ["Outlook", "OneDrive", "Linnea/shared-memory.json", "Linnea/linnea-drive-memory.json"]
 }

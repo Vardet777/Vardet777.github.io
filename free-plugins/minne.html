@@ -4,24 +4,50 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Free-Plugins — delat minne</title>
-<link rel="stylesheet" href="./css/site.css?v=24"/>
-<link rel="stylesheet" href="./css/photos-a.css?v=24"/>
-<link rel="stylesheet" href="./css/photos.css?v=24"/>
+<link rel="stylesheet" href="./css/site.css?v=25"/>
+<link rel="stylesheet" href="./css/photos-a.css?v=25"/>
+<link rel="stylesheet" href="./css/photos.css?v=25"/>
 </head>
 <body>
   <div class="wrap">
     <header class="top" id="site-header"></header>
     <p class="kicker">Delat minne</p>
     <h1>Gemensamt AI-minne i Google Drive.</h1>
-    <p class="lead">En fil för alla AI: <code>gemensamt-ai-minne.json</code> i mappen <code>Gemensamt-AI-minne</code>. OneDrive och Outlook är ersatta.</p>
-    <p class="hint">Sajten cachar lokalt. Grok läser och skriver Drive-filen när du ber om det.</p>
+    <p class="lead">En fil för alla AI: <code>gemensamt-ai-minne.json</code> i mappen <code>Gemensamt-AI-minne</code> på <strong>lundgrennisse@gmail.com</strong>. Drive-länkar kommer när det kontot äger filen.</p>
+    <p class="status" id="stat"></p>
+    <p class="hint">Telefonen sparar minnet i webbläsaren. Ladda ner JSON här. Drive skapas först när kopplingen är lundgrennisse@gmail.com.</p>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 20px">
-      <a class="card" href="https://drive.google.com/file/d/1EiFXug8dHGyRJmRYRPn_dtP3N2J1QXbJ/view" style="padding:12px 16px">Öppna minnesfilen</a>
-      <a class="card" href="https://drive.google.com/drive/folders/1ncKVnykpC7XTsMAKHVqn6L43_kEhygXM" style="padding:12px 16px">Öppna mappen</a>
-      <a class="card" href="https://docs.google.com/document/d/1xGtI2oetkIBMW2QtH1aH7xuNC3nSs9hiUXrYN899uhc/edit" style="padding:12px 16px">Läs LAS-MIG</a>
+      <button type="button" id="exp">Ladda ner lokal kopia</button>
+      <label class="ghost" style="padding:10px 12px;border:1px solid var(--line);border-radius:12px;cursor:pointer">Importera JSON<input id="imp" type="file" accept="application/json,.json" hidden/></label>
     </div>
+    <h2>Fakta</h2><ul class="facts" id="facts"></ul>
+    <h2>Senaste händelser</h2><ul class="facts" id="events"></ul>
+    <h2>Verk</h2><ul class="facts" id="works"></ul>
     <footer id="site-footer"></footer>
   </div>
-  <script type="module" src="./js/shell.js"></script>
+  <script type="module">
+    import "./js/shell.js";
+    import { loadBank, exportBank, importFile, DRIVE_FILE } from "./js/memory.js";
+    function draw() {
+      const bank = loadBank();
+      document.getElementById("stat").innerHTML =
+        `<span><i class="dot on"></i> ${bank.facts.length} fakta</span>` +
+        `<span>${bank.events.length} händelser</span>` +
+        `<span>${bank.works.length} verk</span>` +
+        `<span>Drive: ${bank.drive?.status || "pending-owner-drive"} → ${DRIVE_FILE}</span>`;
+      const li = (rows, map) => rows.slice().reverse().slice(0, 20).map(map).join("") || "<li>Tomt.</li>";
+      document.getElementById("facts").innerHTML = li(bank.facts, (f) => `<li>${f.text} <span class="hint">${f.agent} · ${f.at}</span></li>`);
+      document.getElementById("events").innerHTML = li(bank.events, (e) => `<li>${e.agent} / ${e.kind}: ${e.text}</li>`);
+      document.getElementById("works").innerHTML = li(bank.works, (w) => `<li>${w.kind || "verk"} · ${w.name || ""}</li>`);
+    }
+    draw();
+    document.getElementById("exp").addEventListener("click", () => { exportBank(); draw(); });
+    document.getElementById("imp").addEventListener("change", async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      await importFile(file);
+      draw();
+    });
+  </script>
 </body>
 </html>
