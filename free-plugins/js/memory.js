@@ -7,7 +7,6 @@ export const DRIVE_FILE_ID = "";
 export const DRIVE_FILE = "gemensamt-ai-minne.json";
 export const DRIVE_FILE_URL = "";
 export const DRIVE_FOLDER_URL = "";
-export const ONEDRIVE_PATH = "Google Drive/Gemensamt-AI-minne/gemensamt-ai-minne.json";
 
 function now() { return new Date().toISOString(); }
 
@@ -16,7 +15,7 @@ function emptyBank() {
     version: 2,
     owner: "Vardet777",
     updatedAt: null,
-    backend: "google-drive",
+    backend: "local-export",
     drive: {
       folder: DRIVE_FOLDER,
       ownerEmail: DRIVE_OWNER_EMAIL,
@@ -27,9 +26,9 @@ function emptyBank() {
       folderUrl: DRIVE_FOLDER_URL,
       status: "pending-owner-drive",
       bound: false,
-      note: "Väntar på Drive-konto lundgrennisse@gmail.com. Enheten cachar lokalt."
+      note: "Lokal cache/export är aktiv. Google Drive blir canonical extern backend först efter faktisk bindning och verifierad synk."
     },
-    onedrive: { target: ONEDRIVE_PATH, status: "replaced-by-drive", lastExport: null, bound: false, note: "OneDrive är inte backend." },
+    onedrive: { status: "not-backend", bound: false, lastExport: null, note: "OneDrive är inte backend för delat AI-minne." },
     facts: [],
     events: [],
     works: []
@@ -46,7 +45,9 @@ export function loadBank() {
     bank.works = Array.isArray(bank.works) ? bank.works : [];
     bank.drive = { ...emptyBank().drive, ...(bank.drive || {}) };
     bank.onedrive = { ...emptyBank().onedrive, ...(bank.onedrive || {}) };
-    bank.backend = "google-drive";
+    bank.backend = "local-export";
+    bank.drive.status = bank.drive.bound ? "bound" : "pending-owner-drive";
+    bank.onedrive.status = "not-backend";
     return bank;
   } catch {
     return emptyBank();
@@ -108,7 +109,7 @@ export function contextForAgent(agent) {
 }
 
 export function canBindFolder() { return false; }
-export async function bindOneDriveFolder() { throw new Error("OneDrive är ersatt av Google Drive."); }
+export async function bindOneDriveFolder() { throw new Error("OneDrive är inte backend för delat AI-minne."); }
 export async function syncBoundFolder() { return { ok: false, status: "pending-owner-drive" }; }
 
 export function mergeBank(incoming) {
@@ -118,7 +119,7 @@ export function mergeBank(incoming) {
   const facts = byId(cur.facts); for (const row of src.facts || []) if (row?.id) facts.set(row.id, row);
   const events = byId(cur.events); for (const row of src.events || []) if (row?.id) events.set(row.id, row);
   const works = byId(cur.works); for (const row of src.works || []) if (row?.id) works.set(row.id, row);
-  return persist({ ...cur, ...src, facts: [...facts.values()], events: [...events.values()], works: [...works.values()], drive: { ...cur.drive, ...(src.drive || {}) }, backend: "google-drive" });
+  return persist({ ...cur, ...src, facts: [...facts.values()], events: [...events.values()], works: [...works.values()], drive: { ...cur.drive, ...(src.drive || {}), bound: false, status: "pending-owner-drive" }, onedrive: { ...cur.onedrive, status: "not-backend", bound: false }, backend: "local-export" });
 }
 
 export function exportBank() {
