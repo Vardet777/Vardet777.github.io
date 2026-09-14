@@ -30,7 +30,7 @@
   </div>
   <script type="module">
     import "./js/shell.js";
-    import { addLearning } from "./js/linnea.js";
+    import { addWork } from "./js/memory.js";
     document.getElementById("make").addEventListener("submit", (e) => {
       e.preventDefault();
       const work = {
@@ -42,7 +42,7 @@
         asset: "sellable",
         rendered: false
       };
-      addLearning(work);
+      addWork(work);
       const blob = new Blob([JSON.stringify(work, null, 2)], { type: "application/json" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
