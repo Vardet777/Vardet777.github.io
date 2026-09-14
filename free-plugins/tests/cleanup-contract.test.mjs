@@ -49,4 +49,12 @@ test("Linnea and Kent use isolated memory stores", () => {
   assert.match(memory, /contextForAgent\(agent\)[\s\S]*loadAgentBank\(agent\)/);
   assert.match(memory, /addFact\(\{ agent/);
   assert.match(memory, /addEvent\(\{ agent/);
+  assert.match(memory, /stripIsolatedFromShared/);
+});
+
+test("Kent must not describe Linnea's private memory as shared", () => {
+  const source = read("js/kent.js");
+  assert.match(source, /Kents egen minneskontext/);
+  assert.match(source, /olika privata minnesgrunder/);
+  assert.doesNotMatch(source, /samma delade minneskontext/);
 });
