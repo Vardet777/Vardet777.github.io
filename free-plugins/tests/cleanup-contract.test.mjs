@@ -66,6 +66,16 @@ test("Private-memory UI stays explicit and points to the correct agent store", (
   assert.match(shell, /Linnea · Kent · separata minnen · verkstad/);
 });
 
+test("Legacy migration preserves both Linnea and Kent before shared cleanup", () => {
+  const source = read("js/memory.js");
+  assert.match(source, /function migrateLegacyAgents\(\)/);
+  assert.match(source, /migrateLegacyAgents\(\)/);
+  assert.match(source, /for \(const agent of ISOLATED_AGENTS\)/);
+  assert.match(source, /legacy\.facts\.filter\(\(row\) => \(row\.agent \|\| \"linnea\"\) === agent\)/);
+  assert.match(source, /legacy\.events\.filter\(\(row\) => \(row\.agent \|\| \"linnea\"\) === agent\)/);
+  assert.match(source, /stripIsolatedFromShared\(legacy\)/);
+});
+
 test("Kent must not describe Linnea's private memory as shared", () => {
   const source = read("js/kent.js");
   assert.match(source, /Kents egen minneskontext/);
