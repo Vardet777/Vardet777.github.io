@@ -1,35 +1,48 @@
 import { contextForAgent, rememberChat, addFact } from "./memory.js";
+import { cookbookChat, renderPassportText, validatePack } from "./pack.js";
+import { getKey, setKey, liveQueue, generateFromQueue } from "./providers.js";
 
-const XAI_KEY = "fp.xai.key";
+const XAI_KEY_OLD = "fp.xai.key";
 
 export function getXaiKey() {
+  const now = getKey("xai");
+  if (now) return now;
   try {
-    return localStorage.getItem(XAI_KEY) || "";
+    const legacy = localStorage.getItem(XAI_KEY_OLD) || "";
+    if (legacy) setKey("xai", legacy);
+    return legacy;
   } catch {
     return "";
   }
 }
 
 export function setXaiKey(value) {
-  const v = String(value || "").trim();
-  if (!v) localStorage.removeItem(XAI_KEY);
-  else localStorage.setItem(XAI_KEY, v);
+  setKey("xai", value);
+  try {
+    if (value) localStorage.setItem(XAI_KEY_OLD, String(value).trim());
+    else localStorage.removeItem(XAI_KEY_OLD);
+  } catch {}
 }
 
-export function replyTo(text, catalog) {
+function findItem(items, q) {
+  const needle = String(q || "").toLowerCase();
+  return items.find((it) => `${it.name} ${it.id} ${(it.tags || []).join(" ")}`.toLowerCase().includes(needle));
+}
+
+export function replyTo(text, catalog, packs = []) {
   const t = String(text || "").trim();
   const items = catalog?.items || [];
   const ctx = contextForAgent("linnea");
   const memoryLine = ctx.factCount
-    ? `\nDelat minne: ${ctx.factCount} fakta, ${ctx.eventCount} händelser, OneDrive ${ctx.onedrive.status}.`
+    ? `\nDelat minne: ${ctx.factCount} fakta, ${ctx.eventCount} händelser. Drive ${ctx.drive?.status || "lokalt"}.`
     : "\nDelat minne är tomt än. Säg kom ihåg: plus en mening.";
 
   if (/^(vad kan du|plugins|hjälp)\s*\??$/i.test(t)) {
     return [
       "Linnea på Free-Plugins-sajten. Kent är ersatt.",
-      "Jag gör: katalog, testupplägg, skapa, pack, delat minne, röst.",
-      "Jag gör inte: publicera sajten, sälja andras plugins, vara Viccy eller Kingen.",
-      "Säg prata för röst. Säg kom ihåg: för externt minne.",
+      "Jag gör: katalog, testupplägg, skapa, pack, kokbokssidor, delat minne, röst, bevakning, AI-kö.",
+      "Jag gör inte: publicera sajten, sälja andras plugins, skrapa kokböcker, vara Viccy eller Kingen.",
+      "Säg prata, kom ihåg:, testa:, recept, azure, ai, eller free-plugins hem.",
       memoryLine.trim()
     ].join("\n");
   }
@@ -37,84 +50,95 @@ export function replyTo(text, catalog) {
     return [
       "Free-Plugins hem:",
       "Sajt: verkstad. Inloggningsvägg på. Inte publicerad som produkt.",
-      "Lokalt: artifacts/free-plugins-site — login.html sedan index.html.",
-      "Repo sajt: github.com/Vardet777/Free-Plugins-4-all",
-      "Kent-repo: github.com/Vardet777/Kent",
-      "KM2 är separat.",
-      "iPhone-appen är en annan yta."
+      "Förhandsvisning (inte produkt): vardet777.github.io/free-plugins/login.html",
+      "KM2 är separat."
+    ].join("\n");
+  }
+  if (/^(ai|koppla|providers|nycklar)\b/i.test(t)) {
+    const live = liveQueue().map((p) => p.label + " · " + p.model).join(", ") || "ingen nyckel än";
+    return [
+      "Gratis AI kopplas på ai.html.",
+      "Live i den här webbläsaren: " + live,
+      "Utan nyckel: lokal Linnea."
     ].join("\n");
   }
   const remember = t.match(/^(kom ihåg|minns|spara)\s*[:\-]?\s*(.+)$/i);
   if (remember) {
     addFact({ agent: "linnea", text: remember[2], tags: ["ägaren"] });
-    return `Sparat i det delade minnet: ${remember[2]}\nAlla agenter på sajten ser det. OneDrive-filen uppdateras när du exporterar.`;
+    return `Sparat i det delade minnet: ${remember[2]}\nDrive-filen skapas när kontot är lundgrennisse@gmail.com.`;
   }
   if (/^minne\b/i.test(t)) {
     return [
       `Delat minne · ägare ${ctx.owner}`,
-      `Fakta ${ctx.factCount} · händelser ${ctx.eventCount} · verk ${ctx.workCount}`,
-      `OneDrive-mål: ${ctx.onedrive.target}`,
-      `Status: ${ctx.onedrive.status}`,
+      `Fakta ${ctx.factCount} · händelser ${ctx.eventCount}`,
+      `Drive-status: ${ctx.drive?.status || "pending-owner-drive"}`,
       ctx.facts || "Inga fakta än."
     ].join("\n");
   }
+  const recipeAsk = t.match(/^(recept|visa|kokbok|laga)\s*[:\-]?\s*(.*)$/i);
+  if (recipeAsk) {
+    const cook = packs.find((p) => p.kind === "cookbook") || packs.find((p) => p.id === "husmanskost-v1");
+    if (!cook) return "Inget kokbokspack inläst. Öppna Pack-sidan.";
+    const q = recipeAsk[2].toLowerCase();
+    let idx = 0;
+    if (q) {
+      const found = (cook.items || []).findIndex((it) => `${it.title} ${it.id}`.toLowerCase().includes(q));
+      if (found >= 0) idx = found;
+    }
+    return cookbookChat(cook, idx);
+  }
   const test = t.match(/^(testa|prova)\s*[:\-]?\s*(.+)$/i);
   if (test) {
-    const q = test[2].toLowerCase();
-    const hit = items.find((it) => `${it.name} ${it.id}`.toLowerCase().includes(q)) || items[0];
-    if (!hit) return "Katalogen är nästan tom. Inget att testa live. Det här är bara ett upplägg.";
-    return [
-      `Testupplägg mot ${hit.name} (${hit.id}).`,
-      "1. Läs posten i katalogen.",
-      "2. Välj en gratis AI som passar kategorin — bara om du själv har den öppen.",
-      "3. Följ officiell länk om den finns. Den här posten har ingen publik adress.",
-      "Inte kört live härifrån."
-    ].join("\n");
+    const hit = findItem(items, test[2]) || items[0];
+    if (!hit) return "Katalogen är tom.";
+    return `Testupplägg mot ${hit.name}. Inte kört live härifrån.`;
   }
   if (/^klarhet\s*[:\-]?/i.test(t)) {
-    return "Klarhet:\n1. Sajten är verkstad.\n2. Linnea ersätter Kent här.\n3. Minnet är delat mellan sajtens agenter.\n4. Appen väntar.\nNästa handling: håll inloggningsväggen.";
+    return "Klarhet:\n1. Sajten är verkstad bakom lösenord.\n2. Linnea ersätter Kent här.\n3. Pack är data + mall.\n4. Ingen nyckel krävs för Prata.";
+  }
+  if (/^beslut\s*[:\-]?/i.test(t)) {
+    return "Beslut:\n1. Förhandsvisning tills du säger publicera.\n2. Drive bara på lundgrennisse@gmail.com.\n3. Moln-AI bara om du klistrar nyckel.";
+  }
+  if (/^plan\s*[:\-]?/i.test(t)) {
+    return "Plan:\n1. Öppna Linnea. Tryck Prata.\n2. Säg kom ihåg: plus en mening.\n3. Koppla Drive som lundgrennisse@gmail.com.";
+  }
+  if (/^fokus\s*[:\-]?/i.test(t)) {
+    return "Fokus: Prata på iPhone, Linnea synlig, lösenordsvägg på. Inte fel Drive-konto.";
+  }
+  if (/^granska\s*[:\-]?/i.test(t)) {
+    return "Granska: pack.js 200. Ingen nyckel krävs för lokal Linnea. IP Vardet777.";
+  }
+  if (/^risk\s*[:\-]?/i.test(t)) {
+    return "Risk: fel Google-konto äger minnet. Tyst läge tystar Prata. Nyckel i localStorage om du klistrar en.";
+  }
+  if (/^atlas\s*[:\-]?/i.test(t)) {
+    return "Atlas: Login → Hem → Linnea / Katalog / Pack / Minne / AI.\nLive: vardet777.github.io/free-plugins/";
   }
   if (/^juridiken/i.test(t)) {
-    return "Bevakning, inte råd: IP Vardet777. Sälj lärdomar, inte andras plugins. Publicera inte utan ägarbeslut. Avtal före första försäljning. OneDrive-minnet är ägarens fil.";
+    return "Bevakning, inte råd: IP Vardet777. Publicera inte utan ägarbeslut. Drive-minnet är ägarens fil.";
   }
   if (/^(röst|prata)\b/i.test(t)) {
-    return "Röst: webbläsarens svenska röst, Liora om den finns. Ingen moln-TTS. Tryck Prata eller Lyssna. Mikrofon kräver ditt tillstånd.";
+    return "Röst: webbläsarens svenska kvinnliga röst. Inte EVIE, inte ZELDA. Tryck Prata.";
   }
-  return `Produkt först: katalog, skapa, pack, minne. Säg testa: plus namn, kom ihåg:, eller free-plugins hem.${memoryLine}`;
+  if (/passport|schema/i.test(t)) {
+    const pass = packs.find((p) => p.id === "pack-passport-v1");
+    return pass ? renderPassportText(pass) : "Passport-pack saknas.";
+  }
+  return `Produkt först: katalog, skapa, pack, minne. Säg testa:, recept, kom ihåg: eller free-plugins hem.${memoryLine}`;
 }
 
-export async function answer(text, catalog) {
-  const local = replyTo(text, catalog);
+const STRUCTURED = /^(vad kan du|plugins|hjälp|var är sajten|vilket repo|free[\s-]?plugins|ai\b|koppla|providers|nycklar|azure|graph|onedrive|kom ihåg|minns|spara|minne\b|recept|visa|kokbok|laga|testa|prova|klarhet|beslut|plan|fokus|granska|risk|atlas|juridiken|röst|prata|passport|schema)/i;
+
+export async function answer(text, catalog, packs = []) {
+  const local = replyTo(text, catalog, packs);
   rememberChat({ query: text, reply: local, agent: "linnea" });
-  const key = getXaiKey();
-  if (!key) return { text: local, source: "local" };
-  try {
-    const ctx = contextForAgent("linnea");
-    const res = await fetch("https://api.x.ai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        authorization: `Bearer ${key}`
-      },
-      body: JSON.stringify({
-        model: "grok-4-1-fast-non-reasoning",
-        temperature: 0.4,
-        messages: [
-          {
-            role: "system",
-            content: `Du är Linnea på Free-Plugins-sajten. Inte Viccy. Inte Queen. Inte Kingen. Inte Kent. Svenska. Kort. Hitta inte på live-URL:er eller att tester körts. IP Vardet777. Delat minne:\n${ctx.facts || "(tomt)"}`
-          },
-          { role: "user", content: text }
-        ]
-      })
-    });
-    if (!res.ok) return { text: local + "\n\n(xAI svarade inte. Lokal linje ovan.)", source: "local" };
-    const data = await res.json();
-    const cloud = data.choices?.[0]?.message?.content?.trim();
-    if (!cloud) return { text: local, source: "local" };
-    rememberChat({ query: text, reply: cloud, agent: "linnea" });
-    return { text: cloud, source: "xai" };
-  } catch {
-    return { text: local + "\n\n(xAI nåddes inte. Lokal linje ovan.)", source: "local" };
+  if (STRUCTURED.test(String(text || "").trim()) || !liveQueue().length) {
+    return { text: local, source: "local" };
   }
+  const ctx = contextForAgent("linnea");
+  const system = `Du är Linnea på Free-Plugins-sajten. Inte Viccy. Inte Queen. Inte Kingen. Inte Kent. Svenska. Kort. IP Vardet777. Delat minne:\n${ctx.facts || "(tomt)"}`;
+  const cloud = await generateFromQueue(system, String(text || ""));
+  if (!cloud.text) return { text: local, source: "local", attempts: cloud.attempts };
+  rememberChat({ query: text, reply: cloud.text, agent: "linnea" });
+  return { text: cloud.text, source: cloud.provider, model: cloud.model, attempts: cloud.attempts };
 }
