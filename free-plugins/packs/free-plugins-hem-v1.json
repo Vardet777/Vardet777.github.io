@@ -10,41 +10,38 @@
   "source": "original",
   "owner": "Vardet777",
   "catalogPosition": 1,
-  "does": "Pekar ut var sajten ligger, vad den innehåller och vilket repo som gäller.",
-  "var": {
-    "publicerad": false,
-    "publikWebbadress": null,
-    "inloggning": true,
-    "lokalMapp": "artifacts/free-plugins-site",
-    "startfil": "login.html",
-    "efterInloggning": "index.html",
-    "preview": "https://vardet777.github.io/free-plugins/login.html",
-    "repoSajt": "https://github.com/Vardet777/Free-Plugins-4-all",
-    "repoKent": "https://github.com/Vardet777/Kent",
-    "repoKM2": "https://github.com/Vardet777/KM2",
-    "agent": "Linnea",
-    "kentErsatt": true
+  "does": "Pekar ut Free-Plugins verkstad, canonical repo och den separata agent- och memoryarkitekturen.",
+  "architecture": {
+    "agents": ["linnea", "kent"],
+    "privateMemory": "one-private-bank-per-agent",
+    "sharedWorkspace": true,
+    "crossAgentPrivateMemory": false,
+    "viccyK3MemorySeparate": true
+  },
+  "publication": {
+    "published": false,
+    "loginWall": true,
+    "publicProduct": false
+  },
+  "repositories": {
+    "sourceOfTruth": "https://github.com/Vardet777/Free-Plugins-4-all",
+    "webImplementation": "https://github.com/Vardet777/Vardet777.github.io/tree/main/free-plugins"
+  },
+  "memory": {
+    "current": "local-cache+json-export-import",
+    "googleDrive": "pending",
+    "oneDrive": "not-backend"
   },
   "innehall": [
-    "Katalog: sök, Gratis/Betal, kategorier, texter, taggar",
-    "Skapa: bild, film, musik, nedladdning",
-    "Linnea (Kent ersatt)",
-    "Reklamplatser",
+    "Katalog",
+    "Skapa",
+    "Linnea",
+    "Kent",
+    "Minne",
     "Pack",
-    "villkor/integritet"
-  ],
-  "sidor": [
-    "login.html",
-    "index.html",
-    "katalog.html",
-    "skapa.html",
-    "linnea.html",
-    "kent.html",
-    "reklam.html",
-    "pack.html",
-    "om.html",
-    "villkor.html",
-    "integritet.html"
+    "AI-providerlager",
+    "Bevakning",
+    "Villkor och integritet"
   ],
   "packfil": "packs/free-plugins-hem-v1.json"
 }
