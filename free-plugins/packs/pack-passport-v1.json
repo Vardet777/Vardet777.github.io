@@ -9,6 +9,16 @@
   "attribution": "Originaltexter, Vardet777",
   "source": "original",
   "owner": "Vardet777",
-  "does": "Beskriver hur ett pack ser ut i v1.",
-  "innehall": ["id name version kind license language status source", "ingen scraped källa", "ingen körbar tredjepartskod"]
+  "catalogPosition": 3,
+  "does": "Beskriver hur ett AI-neutralt Free-Plugins-pack ser ut och vilka grundregler som gäller för v1.",
+  "capabilities": ["describe_pack", "validate_pack"],
+  "requiredFields": ["id", "name", "version", "kind", "license", "language", "status", "source"],
+  "allowedSources": ["original", "cc-licensed", "licensed-contract"],
+  "prohibitedSources": ["scraped", "famous-chef-unlicensed"],
+  "v1Rules": [
+    "Ingen körbar tredjepartskod i v1.",
+    "Publicering kräver ägarbeslut.",
+    "Provenance och verifieringsstatus ska kunna uttryckas.",
+    "Permissions och compatibility ska kunna uttryckas när packstandarden utökas."
+  ]
 }
