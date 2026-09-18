@@ -1,4 +1,5 @@
 import { decideGuestPluginTest } from "./guest-test-engine.js";
+import { createKentGuestTest } from "./kent-guest.js";
 
 const assert = (condition, message) => {
   if (!condition) throw new Error(message);
@@ -13,6 +14,11 @@ export function runGuestTestEngineTests() {
 
   const allowed = decideGuestPluginTest(base);
   assert(allowed.allowed === true, "active guest + enabled plugin should be allowed");
+
+  const kent = createKentGuestTest(base);
+  assert(kent.allowed === true, "Kent guest execution should be allowed for valid guest test");
+  assert(kent.agent === "kent", "guest execution must target Kent");
+  assert(kent.context === "guest_test", "guest execution must retain guest_test context");
 
   assert(decideGuestPluginTest({ ...base, session: { ...base.session, status: "revoked" } }).allowed === false, "revoked guest session must be denied");
   assert(decideGuestPluginTest({ ...base, session: { ...base.session, expires_at: Date.now() - 1 } }).allowed === false, "expired guest session must be denied");
