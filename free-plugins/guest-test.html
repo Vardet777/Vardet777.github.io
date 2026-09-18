@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Free Plugins — Testa plugin med Kent</title>
+</head>
+<body>
+  <main>
+    <h1>Testa plugins live</h1>
+    <p>Välj en plugin och testa den i en isolerad gästscession med Kent.</p>
+    <button id="test-demo" type="button">Testa demo-plugin med Kent</button>
+    <pre id="result" aria-live="polite"></pre>
+  </main>
+  <script type="module">
+    import { createKentGuestTest } from "./js/kent-guest.js";
+
+    const result = document.querySelector("#result");
+    document.querySelector("#test-demo").addEventListener("click", () => {
+      const decision = createKentGuestTest({
+        session: { id: "guest-demo", status: "active", expires_at: Date.now() + 300000 },
+        policy: { plugin_id: "demo-plugin", guest_test_enabled: true, execution_mode: "sandbox" }
+      });
+      result.textContent = decision.allowed
+        ? "Kent är redo att köra demo-plugin i gästscessionen."
+        : `Test nekades: ${decision.reason}`;
+    });
+  </script>
+</body>
+</html>
