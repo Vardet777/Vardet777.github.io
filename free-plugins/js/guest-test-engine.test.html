@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="sv"><head><meta charset="utf-8"><title>Guest Test Engine verification</title></head>
+<body><pre id="out">Kör…</pre><script type="module">
+import { runGuestTestEngineTests } from "./guest-test-engine.test.js";
+try {
+  runGuestTestEngineTests();
+  document.getElementById("out").textContent = "PASS: Guest Test Engine boundary tests";
+} catch (error) {
+  document.getElementById("out").textContent = `FAIL: ${error.message}`;
+  throw error;
+}
+</script></body></html>
